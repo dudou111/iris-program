@@ -1,0 +1,177 @@
+{
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "^u-(.*)": "uview-plus/components/u-$1/u-$1.vue"
+    }
+  },
+  "pages": [
+    {
+      "path": "pages/home/home",
+      "style": {
+        "navigationBarTitleText": "校园广场"
+      }
+    },
+    {
+      "path": "pages/circles/circles",
+      "style": {
+        "navigationBarTitleText": "圈子"
+      }
+    },
+    {
+      "path": "pages/activities/activities",
+      "style": {
+        "navigationBarTitleText": "活动"
+      }
+    },
+    {
+      "path": "pages/resource/resource",
+      "style": {
+        "navigationBarTitleText": "资源"
+      }
+    },
+    {
+      "path": "pages/publish/publish",
+      "style": {
+        "navigationBarTitleText": "发布"
+      }
+    },
+    {
+      "path": "pages/profile/profile",
+      "style": {
+        "navigationBarTitleText": "个人中心"
+      }
+    },
+    {
+      "path": "pages/search/search",
+      "style": {
+        "navigationBarTitleText": "搜索"
+      }
+    },
+    {
+      "path": "pages/notification/notification",
+      "style": {
+        "navigationBarTitleText": "通知"
+      }
+    },
+    {
+      "path": "pages/message/message",
+      "style": {
+        "navigationBarTitleText": "消息"
+      }
+    },
+    {
+      "path": "pages/chat/chat",
+      "style": {
+        "navigationBarTitleText": "聊天"
+      }
+    },
+    {
+      "path": "pages/post-detail/post-detail",
+      "style": {
+        "navigationBarTitleText": "动态详情"
+      }
+    },
+    {
+      "path": "pages/resource-detail/resource-detail",
+      "style": {
+        "navigationBarTitleText": "资源详情"
+      }
+    },
+    {
+      "path": "pages/circle-detail/circle-detail",
+      "style": {
+        "navigationBarTitleText": "圈子详情"
+      }
+    },
+    {
+      "path": "pages/activity-detail/activity-detail",
+      "style": {
+        "navigationBarTitleText": "活动详情"
+      }
+    },
+    {
+      "path": "pages/user-profile/user-profile",
+      "style": {
+        "navigationBarTitleText": "用户主页"
+      }
+    },
+    {
+      "path": "pages/my-posts/my-posts",
+      "style": {
+        "navigationBarTitleText": "我的发布"
+      }
+    },
+    {
+      "path": "pages/my-collections/my-collections",
+      "style": {
+        "navigationBarTitleText": "我的收藏"
+      }
+    },
+    {
+      "path": "pages/following/following",
+      "style": {
+        "navigationBarTitleText": "我的关注"
+      }
+    },
+    {
+      "path": "pages/followers/followers",
+      "style": {
+        "navigationBarTitleText": "我的粉丝"
+      }
+    },
+    {
+      "path": "pages/edit-profile/edit-profile",
+      "style": {
+        "navigationBarTitleText": "编辑资料"
+      }
+    },
+    {
+      "path": "pages/settings/settings",
+      "style": {
+        "navigationBarTitleText": "设置"
+      }
+    },
+    {
+      "path": "pages/login/login",
+      "style": {
+        "navigationBarTitleText": "登录"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "Iris Program",
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "backgroundColor": "#F8F8F8"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#7A7E83",
+    "selectedColor": "#1890ff",
+    "borderStyle": "black",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/home/home",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/circles/circles",
+        "text": "圈子"
+      },
+      {
+        "pagePath": "pages/activities/activities",
+        "text": "活动"
+      },
+      {
+        "pagePath": "pages/resource/resource",
+        "text": "资源"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的"
+      }
+    ]
+  }
+}
