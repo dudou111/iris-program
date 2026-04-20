@@ -38,6 +38,9 @@ const handleUnfollow = (user: any) => {
 </script>
 
 <style scoped>
+/* 已优化为跨平台样式，使用rpx单位 */
+/* 使用 #ifdef H5 / #ifdef MP 添加平台特定样式 */
+
 .following-page {
   min-height: 100vh;
   background: var(--color-bg-page);
@@ -46,7 +49,7 @@ const handleUnfollow = (user: any) => {
 .header {
   position: sticky;
   top: 0;
-  height: 44px;
+  height: 88rpx;
   padding: 0 var(--page-padding);
   background: var(--color-bg-white);
   display: flex;
@@ -65,8 +68,8 @@ const handleUnfollow = (user: any) => {
 }
 
 .icon-btn {
-  width: 24px;
-  height: 24px;
+  width: 48rpx;
+  height: 48rpx;
   color: var(--color-text-secondary);
   cursor: pointer;
 }
@@ -87,8 +90,8 @@ const handleUnfollow = (user: any) => {
 }
 
 .user-avatar {
-  width: 48px;
-  height: 48px;
+  width: 96rpx;
+  height: 96rpx;
   border-radius: var(--radius-round);
   flex-shrink: 0;
 }
@@ -101,7 +104,7 @@ const handleUnfollow = (user: any) => {
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-primary);
-  margin-bottom: 4px;
+  margin-bottom: 8rpx;
 }
 
 .user-bio {
@@ -110,7 +113,7 @@ const handleUnfollow = (user: any) => {
 }
 
 .btn-unfollow {
-  padding: 6px 16px;
+  padding: 12rpx 32rpx;
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   background: var(--color-bg-gray);

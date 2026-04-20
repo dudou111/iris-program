@@ -31,6 +31,9 @@ const handleGoBack = () => {
 </script>
 
 <style scoped>
+/* 已优化为跨平台样式，使用rpx单位 */
+/* 使用 #ifdef H5 / #ifdef MP 添加平台特定样式 */
+
 .not-found-page {
   min-height: 100vh;
   display: flex;
@@ -42,11 +45,11 @@ const handleGoBack = () => {
 
 .not-found-content {
   text-align: center;
-  max-width: 400px;
+  max-width: 800rpx;
 }
 
 .error-code {
-  font-size: 120px;
+  font-size: 240rpx;
   font-weight: var(--font-weight-bold);
   color: var(--color-primary);
   line-height: 1;
@@ -75,7 +78,7 @@ const handleGoBack = () => {
 
 .btn-primary,
 .btn-secondary {
-  height: 44px;
+  height: 88rpx;
   padding: 0 var(--spacing-xl);
   font-size: var(--font-size-base);
   border: none;

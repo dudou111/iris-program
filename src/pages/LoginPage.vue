@@ -17,7 +17,12 @@
             type="text"
             placeholder="请输入学号/手机号"
             class="form-input"
-          />
+          /
+            :adjust-position="true"
+            :hold-keyboard="false"
+            :cursor-spacing="50"
+            placeholder-style="color: #999;"
+          >
         </view>
       </view>
 
@@ -29,7 +34,12 @@
             :type="showPassword ? 'text' : 'password'"
             placeholder="请输入密码"
             class="form-input"
-          />
+          /
+            :adjust-position="true"
+            :hold-keyboard="false"
+            :cursor-spacing="50"
+            placeholder-style="color: #999;"
+          >
           <Eye
             v-if="!showPassword"
             :size="20"
@@ -47,7 +57,12 @@
 
       <view class="form-options">
         <label class="remember-me">
-          <input v-model="rememberMe" type="checkbox" />
+          <input v-model="rememberMe" type="checkbox" /
+            :adjust-position="true"
+            :hold-keyboard="false"
+            :cursor-spacing="50"
+            placeholder-style="color: #999;"
+          >
           <span>记住密码</span>
         </label>
         <span class="forgot-password" @tap="handleForgotPassword">忘记密码？</span>
@@ -72,7 +87,12 @@
     <!-- 底部协议 -->
     <view class="agreement">
       <label>
-        <input v-model="agreeTerms" type="checkbox" />
+        <input v-model="agreeTerms" type="checkbox" /
+            :adjust-position="true"
+            :hold-keyboard="false"
+            :cursor-spacing="50"
+            placeholder-style="color: #999;"
+          >
         <span>我已阅读并同意</span>
       </label>
       <span class="link" @tap="handleShowTerms">《用户协议》</span>
@@ -148,6 +168,9 @@ const handleShowPrivacy = () => {
 </script>
 
 <style scoped>
+/* 已优化为跨平台样式，使用rpx单位 */
+/* 使用 #ifdef H5 / #ifdef MP 添加平台特定样式 */
+
 .login-page {
   min-height: 100vh;
   padding: var(--spacing-xl) var(--page-padding);
@@ -163,7 +186,7 @@ const handleShowPrivacy = () => {
 }
 
 .logo {
-  font-size: 80px;
+  font-size: 160rpx;
   margin-bottom: var(--spacing-md);
 }
 
@@ -183,7 +206,7 @@ const handleShowPrivacy = () => {
   background: var(--color-bg-white);
   border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 16rpx 64rpx rgba(0, 0, 0, 0.1);
 }
 
 .form-item {
@@ -194,7 +217,7 @@ const handleShowPrivacy = () => {
   position: relative;
   display: flex;
   align-items: center;
-  height: 48px;
+  height: 96rpx;
   background: var(--color-bg-gray);
   border-radius: var(--radius-md);
   padding: 0 var(--spacing-md);
@@ -245,7 +268,7 @@ const handleShowPrivacy = () => {
 .btn-login,
 .btn-wechat {
   width: 100%;
-  height: 48px;
+  height: 96rpx;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -282,7 +305,7 @@ const handleShowPrivacy = () => {
   position: absolute;
   top: 50%;
   width: 40%;
-  height: 1px;
+  height: 2rpx;
   background: var(--color-border-base);
 }
 

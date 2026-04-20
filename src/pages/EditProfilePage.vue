@@ -19,22 +19,42 @@
 
       <view class="form-item">
         <span class="item-label">昵称</span>
-        <input v-model="form.username" type="text" class="item-input" />
+        <input v-model="form.username" type="text" class="item-input" /
+            :adjust-position="true"
+            :hold-keyboard="false"
+            :cursor-spacing="50"
+            placeholder-style="color: #999;"
+          >
       </view>
 
       <view class="form-item">
         <span class="item-label">个性签名</span>
-        <input v-model="form.bio" type="text" class="item-input" placeholder="介绍一下自己吧" />
+        <input v-model="form.bio" type="text" class="item-input" placeholder="介绍一下自己吧" /
+            :adjust-position="true"
+            :hold-keyboard="false"
+            :cursor-spacing="50"
+            placeholder-style="color: #999;"
+          >
       </view>
 
       <view class="form-item">
         <span class="item-label">学校</span>
-        <input v-model="form.school" type="text" class="item-input" />
+        <input v-model="form.school" type="text" class="item-input" /
+            :adjust-position="true"
+            :hold-keyboard="false"
+            :cursor-spacing="50"
+            placeholder-style="color: #999;"
+          >
       </view>
 
       <view class="form-item">
         <span class="item-label">院系</span>
-        <input v-model="form.department" type="text" class="item-input" />
+        <input v-model="form.department" type="text" class="item-input" /
+            :adjust-position="true"
+            :hold-keyboard="false"
+            :cursor-spacing="50"
+            placeholder-style="color: #999;"
+          >
       </view>
     </view>
   </view>
@@ -60,6 +80,9 @@ const handleSave = () => {
 </script>
 
 <style scoped>
+/* 已优化为跨平台样式，使用rpx单位 */
+/* 使用 #ifdef H5 / #ifdef MP 添加平台特定样式 */
+
 .edit-profile-page {
   min-height: 100vh;
   background: var(--color-bg-page);
@@ -68,7 +91,7 @@ const handleSave = () => {
 .header {
   position: sticky;
   top: 0;
-  height: 44px;
+  height: 88rpx;
   padding: 0 var(--page-padding);
   background: var(--color-bg-white);
   display: flex;
@@ -87,8 +110,8 @@ const handleSave = () => {
 }
 
 .icon-btn {
-  width: 24px;
-  height: 24px;
+  width: 48rpx;
+  height: 48rpx;
   color: var(--color-text-secondary);
   cursor: pointer;
 }
@@ -116,7 +139,7 @@ const handleSave = () => {
 }
 
 .item-label {
-  width: 80px;
+  width: 160rpx;
   font-size: var(--font-size-base);
   color: var(--color-text-primary);
   flex-shrink: 0;
@@ -132,8 +155,8 @@ const handleSave = () => {
 }
 
 .avatar-preview {
-  width: 60px;
-  height: 60px;
+  width: 120rpx;
+  height: 120rpx;
   border-radius: var(--radius-round);
 }
 

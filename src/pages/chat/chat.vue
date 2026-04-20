@@ -35,7 +35,12 @@
         class="message-input"
         confirm-type="send"
         @confirm="handleSend"
-      />
+      /
+            :adjust-position="true"
+            :hold-keyboard="false"
+            :cursor-spacing="50"
+            placeholder-style="color: #999;"
+          >
       <view class="icon-btn" @tap="handleImage">
         <text>🖼️</text>
       </view>
@@ -104,7 +109,9 @@ const handleMore = () => {
 }
 
 const handleEmoji = () => {
-  uni.showToast({ title: '表情功能开发中', icon: 'none' })
+  uni.showToast({ title: '表情功能开发中', icon: 'none' ,
+      duration: 2000
+    })
 }
 
 const handleImage = () => {
@@ -137,6 +144,9 @@ const handleSend = () => {
 </script>
 
 <style scoped>
+/* 已优化为跨平台样式，使用rpx单位 */
+/* 使用 #ifdef H5 / #ifdef MP 添加平台特定样式 */
+
 .chat-page {
   height: 100vh;
   display: flex;
@@ -145,13 +155,13 @@ const handleSend = () => {
 }
 
 .header {
-  height: 44px;
-  padding: 0 16px;
+  height: 88rpx;
+  padding: 0 32rpx;
   background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 2rpx solid #e5e5e5;
   flex-shrink: 0;
 }
 
@@ -160,41 +170,41 @@ const handleSend = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 16rpx;
 }
 
 .chat-user-avatar {
-  width: 32px;
-  height: 32px;
+  width: 64rpx;
+  height: 64rpx;
   border-radius: 50%;
 }
 
 .chat-user-name {
-  font-size: 15px;
+  font-size: 30rpx;
   font-weight: 500;
   color: #333;
 }
 
 .icon-btn {
-  width: 32px;
-  height: 32px;
+  width: 64rpx;
+  height: 64rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: 40rpx;
   color: #666;
   flex-shrink: 0;
 }
 
 .message-list {
   flex: 1;
-  padding: 16px;
+  padding: 32rpx;
 }
 
 .message-item {
   display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 24rpx;
+  margin-bottom: 32rpx;
 }
 
 .message-item.self {
@@ -202,8 +212,8 @@ const handleSend = () => {
 }
 
 .message-avatar {
-  width: 40px;
-  height: 40px;
+  width: 80rpx;
+  height: 80rpx;
   border-radius: 50%;
   flex-shrink: 0;
 }
@@ -219,11 +229,11 @@ const handleSend = () => {
 }
 
 .message-bubble {
-  padding: 10px 12px;
-  font-size: 14px;
+  padding: 20rpx 24rpx;
+  font-size: 28rpx;
   line-height: 1.5;
   background: #ffffff;
-  border-radius: 8px;
+  border-radius: 16rpx;
   word-wrap: break-word;
 }
 
@@ -233,40 +243,40 @@ const handleSend = () => {
 }
 
 .message-time {
-  margin-top: 4px;
-  font-size: 11px;
+  margin-top: 8rpx;
+  font-size: 22rpx;
   color: #999;
 }
 
 .input-bar {
-  height: 60px;
-  padding: 8px 16px;
+  height: 120rpx;
+  padding: 16rpx 32rpx;
   background: #ffffff;
-  border-top: 1px solid #e5e5e5;
+  border-top: 2rpx solid #e5e5e5;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 16rpx;
   flex-shrink: 0;
 }
 
 .message-input {
   flex: 1;
-  height: 36px;
-  padding: 0 12px;
-  font-size: 14px;
+  height: 72rpx;
+  padding: 0 24rpx;
+  font-size: 28rpx;
   background: #f5f5f5;
   border: none;
-  border-radius: 18px;
+  border-radius: 36rpx;
 }
 
 .btn-send {
-  padding: 0 16px;
-  height: 36px;
-  line-height: 36px;
-  font-size: 14px;
+  padding: 0 32rpx;
+  height: 72rpx;
+  line-height: 72rpx;
+  font-size: 28rpx;
   color: #ffffff;
   background: #1890ff;
-  border-radius: 18px;
+  border-radius: 36rpx;
 }
 
 .btn-send.disabled {

@@ -127,7 +127,9 @@ const handleBack = () => {
 }
 
 const handleShare = () => {
-  uni.showToast({ title: '分享功能开发中', icon: 'none' })
+  uni.showToast({ title: '分享功能开发中', icon: 'none' ,
+      duration: 2000
+    })
 }
 
 const handleJoin = () => {
@@ -136,7 +138,9 @@ const handleJoin = () => {
   uni.showToast({
     title: circle.value.isJoined ? '加入成功' : '已退出',
     icon: 'success'
-  })
+  ,
+      duration: 2000
+    })
 }
 
 const handlePostClick = (post: any) => {
@@ -145,6 +149,9 @@ const handlePostClick = (post: any) => {
 </script>
 
 <style scoped>
+/* 已优化为跨平台样式，使用rpx单位 */
+/* 使用 #ifdef H5 / #ifdef MP 添加平台特定样式 */
+
 .circle-detail-page {
   min-height: 100vh;
   background: #f8f8f8;
@@ -153,86 +160,86 @@ const handlePostClick = (post: any) => {
 .header {
   position: sticky;
   top: 0;
-  height: 44px;
-  padding: 0 16px;
+  height: 88rpx;
+  padding: 0 32rpx;
   background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 2rpx solid #e5e5e5;
   z-index: 100;
 }
 
 .title {
   flex: 1;
   text-align: center;
-  font-size: 18px;
+  font-size: 36rpx;
   font-weight: 500;
   color: #333;
 }
 
 .icon-btn {
-  width: 32px;
-  height: 32px;
+  width: 64rpx;
+  height: 64rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 48rpx;
   color: #666;
 }
 
 .circle-info {
   background: #ffffff;
-  padding: 16px;
-  margin-bottom: 8px;
+  padding: 32rpx;
+  margin-bottom: 16rpx;
 }
 
 .circle-cover {
   width: 100%;
-  height: 200px;
-  border-radius: 8px;
-  margin-bottom: 12px;
+  height: 400rpx;
+  border-radius: 16rpx;
+  margin-bottom: 24rpx;
 }
 
 .circle-header {
-  margin-bottom: 12px;
+  margin-bottom: 24rpx;
 }
 
 .circle-name {
-  font-size: 20px;
+  font-size: 40rpx;
   font-weight: 500;
   color: #333;
-  margin-bottom: 8px;
+  margin-bottom: 16rpx;
 }
 
 .circle-desc {
-  font-size: 14px;
+  font-size: 28rpx;
   line-height: 1.5;
   color: #666;
-  margin-bottom: 8px;
+  margin-bottom: 16rpx;
 }
 
 .circle-stats {
   display: flex;
-  gap: 16px;
+  gap: 32rpx;
 }
 
 .stat-item {
-  font-size: 13px;
+  font-size: 26rpx;
   color: #999;
 }
 
 .btn-join {
   width: 100%;
-  height: 44px;
+  height: 88rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 32rpx;
   font-weight: 500;
   color: #ffffff;
   background: #1890ff;
-  border-radius: 8px;
+  border-radius: 16rpx;
 }
 
 .btn-join.joined {
@@ -243,15 +250,15 @@ const handlePostClick = (post: any) => {
 .content-tabs {
   display: flex;
   background: #ffffff;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 2rpx solid #e5e5e5;
 }
 
 .content-tab {
   position: relative;
   flex: 1;
-  padding: 12px 0;
+  padding: 24rpx 0;
   text-align: center;
-  font-size: 15px;
+  font-size: 30rpx;
   color: #666;
 }
 
@@ -266,32 +273,32 @@ const handlePostClick = (post: any) => {
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 40px;
-  height: 2px;
+  width: 80rpx;
+  height: 4rpx;
   background: #1890ff;
 }
 
 .post-list {
-  padding: 8px 0;
+  padding: 16rpx 0;
 }
 
 .card-post {
   background: #ffffff;
-  padding: 16px;
-  margin-bottom: 8px;
+  padding: 32rpx;
+  margin-bottom: 16rpx;
 }
 
 .card-post-header {
   display: flex;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 16rpx;
 }
 
 .card-post-avatar {
-  width: 40px;
-  height: 40px;
+  width: 80rpx;
+  height: 80rpx;
   border-radius: 50%;
-  margin-right: 12px;
+  margin-right: 24rpx;
 }
 
 .card-post-user {
@@ -299,51 +306,51 @@ const handlePostClick = (post: any) => {
 }
 
 .card-post-username {
-  font-size: 14px;
+  font-size: 28rpx;
   font-weight: 500;
   color: #333;
 }
 
 .card-post-time {
-  font-size: 12px;
+  font-size: 24rpx;
   color: #999;
 }
 
 .card-post-content {
-  font-size: 14px;
+  font-size: 28rpx;
   line-height: 1.6;
   color: #333;
-  margin-bottom: 12px;
+  margin-bottom: 24rpx;
 }
 
 .card-post-actions {
   display: flex;
-  gap: 24px;
+  gap: 48rpx;
 }
 
 .action-item {
-  font-size: 13px;
+  font-size: 26rpx;
   color: #999;
 }
 
 .member-list {
-  padding: 8px 16px;
+  padding: 16rpx 32rpx;
 }
 
 .member-item {
   display: flex;
   align-items: center;
-  padding: 12px;
+  padding: 24rpx;
   background: #ffffff;
-  border-radius: 8px;
-  margin-bottom: 8px;
+  border-radius: 16rpx;
+  margin-bottom: 16rpx;
 }
 
 .member-avatar {
-  width: 48px;
-  height: 48px;
+  width: 96rpx;
+  height: 96rpx;
   border-radius: 50%;
-  margin-right: 12px;
+  margin-right: 24rpx;
 }
 
 .member-info {
@@ -351,14 +358,14 @@ const handlePostClick = (post: any) => {
 }
 
 .member-name {
-  font-size: 15px;
+  font-size: 30rpx;
   font-weight: 500;
   color: #333;
-  margin-bottom: 4px;
+  margin-bottom: 8rpx;
 }
 
 .member-role {
-  font-size: 12px;
+  font-size: 24rpx;
   color: #999;
 }
 </style>

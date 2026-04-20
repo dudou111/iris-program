@@ -14,7 +14,12 @@
           @input="handleSearch"
           confirm-type="search"
           @confirm="handleSearchSubmit"
-        />
+        /
+            :adjust-position="true"
+            :hold-keyboard="false"
+            :cursor-spacing="50"
+            placeholder-style="color: #999;"
+          >
         <text v-if="searchQuery" class="clear-icon" @tap="handleClear">✕</text>
       </view>
     </view>
@@ -231,6 +236,9 @@ const handleResourceClick = (resource: any) => {
 </script>
 
 <style scoped>
+/* 已优化为跨平台样式，使用rpx单位 */
+/* 使用 #ifdef H5 / #ifdef MP 添加平台特定样式 */
+
 .search-page {
   min-height: 100vh;
   background: #f8f8f8;
@@ -239,40 +247,40 @@ const handleResourceClick = (resource: any) => {
 .search-bar {
   position: sticky;
   top: 0;
-  height: 56px;
-  padding: 0 16px;
+  height: 112rpx;
+  padding: 0 32rpx;
   background: #ffffff;
   display: flex;
   align-items: center;
-  gap: 8px;
-  border-bottom: 1px solid #e5e5e5;
+  gap: 16rpx;
+  border-bottom: 2rpx solid #e5e5e5;
   z-index: 100;
 }
 
 .icon-btn {
-  width: 32px;
-  height: 32px;
+  width: 64rpx;
+  height: 64rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 48rpx;
   color: #666;
   flex-shrink: 0;
 }
 
 .search-input-wrapper {
   flex: 1;
-  height: 36px;
+  height: 72rpx;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 12px;
+  gap: 16rpx;
+  padding: 0 24rpx;
   background: #f5f5f5;
-  border-radius: 18px;
+  border-radius: 36rpx;
 }
 
 .search-icon {
-  font-size: 16px;
+  font-size: 32rpx;
   color: #999;
   flex-shrink: 0;
 }
@@ -280,37 +288,37 @@ const handleResourceClick = (resource: any) => {
 .search-input {
   flex: 1;
   height: 100%;
-  font-size: 14px;
+  font-size: 28rpx;
   background: transparent;
   border: none;
 }
 
 .clear-icon {
-  font-size: 14px;
+  font-size: 28rpx;
   color: #999;
   flex-shrink: 0;
 }
 
 .search-history,
 .hot-search {
-  padding: 16px;
+  padding: 32rpx;
 }
 
 .section-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: 24rpx;
 }
 
 .section-title {
-  font-size: 15px;
+  font-size: 30rpx;
   font-weight: 500;
   color: #333;
 }
 
 .clear-btn {
-  font-size: 13px;
+  font-size: 26rpx;
   color: #999;
 }
 
@@ -318,16 +326,16 @@ const handleResourceClick = (resource: any) => {
 .hot-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 16rpx;
 }
 
 .history-tag,
 .hot-tag {
-  padding: 6px 12px;
-  font-size: 13px;
+  padding: 12rpx 24rpx;
+  font-size: 26rpx;
   color: #666;
   background: #ffffff;
-  border-radius: 16px;
+  border-radius: 32rpx;
 }
 
 .hot-tag {
@@ -335,21 +343,21 @@ const handleResourceClick = (resource: any) => {
 }
 
 .search-results {
-  padding-top: 8px;
+  padding-top: 16rpx;
 }
 
 .result-tabs {
   display: flex;
-  gap: 24px;
-  padding: 0 16px;
+  gap: 48rpx;
+  padding: 0 32rpx;
   background: #ffffff;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 2rpx solid #e5e5e5;
 }
 
 .result-tab {
   position: relative;
-  padding: 12px 0;
-  font-size: 15px;
+  padding: 24rpx 0;
+  font-size: 30rpx;
   color: #666;
 }
 
@@ -364,31 +372,31 @@ const handleResourceClick = (resource: any) => {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 2px;
+  height: 4rpx;
   background: #1890ff;
 }
 
 .result-list {
-  padding: 8px 0;
+  padding: 16rpx 0;
 }
 
 .card-post {
   background: #ffffff;
-  padding: 16px;
-  margin-bottom: 8px;
+  padding: 32rpx;
+  margin-bottom: 16rpx;
 }
 
 .card-post-header {
   display: flex;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 16rpx;
 }
 
 .card-post-avatar {
-  width: 32px;
-  height: 32px;
+  width: 64rpx;
+  height: 64rpx;
   border-radius: 50%;
-  margin-right: 12px;
+  margin-right: 24rpx;
 }
 
 .card-post-user {
@@ -396,18 +404,18 @@ const handleResourceClick = (resource: any) => {
 }
 
 .card-post-username {
-  font-size: 14px;
+  font-size: 28rpx;
   font-weight: 500;
   color: #333;
 }
 
 .card-post-time {
-  font-size: 11px;
+  font-size: 22rpx;
   color: #999;
 }
 
 .card-post-content {
-  font-size: 14px;
+  font-size: 28rpx;
   line-height: 1.5;
   color: #666;
 }
@@ -415,15 +423,15 @@ const handleResourceClick = (resource: any) => {
 .user-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px;
+  gap: 24rpx;
+  padding: 32rpx;
   background: #ffffff;
-  margin-bottom: 8px;
+  margin-bottom: 16rpx;
 }
 
 .user-avatar {
-  width: 48px;
-  height: 48px;
+  width: 96rpx;
+  height: 96rpx;
   border-radius: 50%;
   flex-shrink: 0;
 }
@@ -433,37 +441,37 @@ const handleResourceClick = (resource: any) => {
 }
 
 .user-name {
-  font-size: 15px;
+  font-size: 30rpx;
   font-weight: 500;
   color: #333;
-  margin-bottom: 4px;
+  margin-bottom: 8rpx;
 }
 
 .user-bio {
-  font-size: 13px;
+  font-size: 26rpx;
   color: #999;
 }
 
 .btn-follow {
-  padding: 6px 16px;
-  font-size: 13px;
+  padding: 12rpx 32rpx;
+  font-size: 26rpx;
   color: #ffffff;
   background: #1890ff;
-  border-radius: 16px;
+  border-radius: 32rpx;
 }
 
 .resource-item {
   display: flex;
-  gap: 12px;
-  padding: 16px;
+  gap: 24rpx;
+  padding: 32rpx;
   background: #ffffff;
-  margin-bottom: 8px;
+  margin-bottom: 16rpx;
 }
 
 .resource-cover {
-  width: 80px;
-  height: 80px;
-  border-radius: 8px;
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 16rpx;
   flex-shrink: 0;
 }
 
@@ -472,16 +480,16 @@ const handleResourceClick = (resource: any) => {
 }
 
 .resource-title {
-  font-size: 15px;
+  font-size: 30rpx;
   font-weight: 500;
   color: #333;
-  margin-bottom: 8px;
+  margin-bottom: 16rpx;
 }
 
 .resource-meta {
   display: flex;
-  gap: 16px;
-  font-size: 12px;
+  gap: 32rpx;
+  font-size: 24rpx;
   color: #999;
 }
 </style>

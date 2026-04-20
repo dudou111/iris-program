@@ -145,16 +145,19 @@ const handleActivityClick = (activity: any) => {
 </script>
 
 <style scoped>
+/* 已优化为跨平台样式，使用rpx单位 */
+/* 使用 #ifdef H5 / #ifdef MP 添加平台特定样式 */
+
 .activities-page {
   min-height: 100vh;
-  padding-bottom: 50px;
+  padding-bottom: 100rpx;
   background: var(--color-bg-page);
 }
 
 .header {
   position: sticky;
   top: 0;
-  height: 44px;
+  height: 88rpx;
   padding: 0 var(--page-padding);
   background: var(--color-bg-white);
   display: flex;
@@ -172,8 +175,8 @@ const handleActivityClick = (activity: any) => {
 }
 
 .icon-btn {
-  width: 24px;
-  height: 24px;
+  width: 48rpx;
+  height: 48rpx;
   color: var(--color-text-secondary);
   cursor: pointer;
 }
@@ -193,7 +196,7 @@ const handleActivityClick = (activity: any) => {
 
 .category-tab {
   flex-shrink: 0;
-  height: 32px;
+  height: 64rpx;
   padding: 0 var(--spacing-lg);
   display: flex;
   align-items: center;
@@ -224,8 +227,8 @@ const handleActivityClick = (activity: any) => {
 }
 
 .activity-cover {
-  width: 120px;
-  height: 120px;
+  width: 240rpx;
+  height: 240rpx;
   border-radius: var(--radius-md);
   object-fit: cover;
   flex-shrink: 0;
@@ -261,7 +264,7 @@ const handleActivityClick = (activity: any) => {
 
 .activity-status {
   align-self: flex-start;
-  padding: 4px 12px;
+  padding: 8rpx 24rpx;
   font-size: var(--font-size-xs);
   border-radius: var(--radius-full);
 }

@@ -121,16 +121,19 @@ const handleItemClick = (id: number) => {
 </script>
 
 <style scoped>
+/* 已优化为跨平台样式，使用rpx单位 */
+/* 使用 #ifdef H5 / #ifdef MP 添加平台特定样式 */
+
 .resource-page {
   min-height: 100vh;
-  padding-bottom: 50px;
+  padding-bottom: 100rpx;
   background: var(--color-bg-page);
 }
 
 .header {
   position: sticky;
   top: 0;
-  height: 44px;
+  height: 88rpx;
   padding: 0 var(--page-padding);
   background: var(--color-bg-white);
   display: flex;
@@ -153,8 +156,8 @@ const handleItemClick = (id: number) => {
 }
 
 .icon-btn {
-  width: 24px;
-  height: 24px;
+  width: 48rpx;
+  height: 48rpx;
   color: var(--color-text-secondary);
   cursor: pointer;
 }
@@ -167,7 +170,7 @@ const handleItemClick = (id: number) => {
 
 .category-tab {
   flex: 1;
-  height: 44px;
+  height: 88rpx;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -189,8 +192,8 @@ const handleItemClick = (id: number) => {
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 24px;
-  height: 3px;
+  width: 48rpx;
+  height: 6rpx;
   background: var(--color-primary);
   border-radius: var(--radius-full);
 }

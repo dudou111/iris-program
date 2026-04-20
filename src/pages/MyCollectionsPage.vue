@@ -40,6 +40,9 @@ const handleItemClick = (item: any) => {
 </script>
 
 <style scoped>
+/* 已优化为跨平台样式，使用rpx单位 */
+/* 使用 #ifdef H5 / #ifdef MP 添加平台特定样式 */
+
 .my-collections-page {
   min-height: 100vh;
   background: var(--color-bg-page);
@@ -48,7 +51,7 @@ const handleItemClick = (item: any) => {
 .header {
   position: sticky;
   top: 0;
-  height: 44px;
+  height: 88rpx;
   padding: 0 var(--page-padding);
   background: var(--color-bg-white);
   display: flex;
@@ -67,8 +70,8 @@ const handleItemClick = (item: any) => {
 }
 
 .icon-btn {
-  width: 24px;
-  height: 24px;
+  width: 48rpx;
+  height: 48rpx;
   color: var(--color-text-secondary);
   cursor: pointer;
 }
@@ -88,8 +91,8 @@ const handleItemClick = (item: any) => {
 }
 
 .item-cover {
-  width: 80px;
-  height: 80px;
+  width: 160rpx;
+  height: 160rpx;
   border-radius: var(--radius-md);
   object-fit: cover;
   flex-shrink: 0;

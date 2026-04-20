@@ -93,7 +93,9 @@ const handleMarkAllRead = () => {
   uni.showToast({
     title: '已全部标记为已读',
     icon: 'success'
-  })
+  ,
+      duration: 2000
+    })
 }
 
 const handleNotificationClick = (notification: any) => {
@@ -112,6 +114,9 @@ const handleNotificationClick = (notification: any) => {
 </script>
 
 <style scoped>
+/* 已优化为跨平台样式，使用rpx单位 */
+/* 使用 #ifdef H5 / #ifdef MP 添加平台特定样式 */
+
 .notification-page {
   min-height: 100vh;
   background: #f8f8f8;
@@ -120,46 +125,46 @@ const handleNotificationClick = (notification: any) => {
 .header {
   position: sticky;
   top: 0;
-  height: 44px;
-  padding: 0 16px;
+  height: 88rpx;
+  padding: 0 32rpx;
   background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 2rpx solid #e5e5e5;
   z-index: 100;
 }
 
 .title {
   flex: 1;
   text-align: center;
-  font-size: 18px;
+  font-size: 36rpx;
   font-weight: 500;
   color: #333;
 }
 
 .icon-btn {
-  width: 32px;
-  height: 32px;
+  width: 64rpx;
+  height: 64rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 48rpx;
   color: #666;
 }
 
 .notification-list {
-  height: calc(100vh - 44px);
+  height: calc(100vh - 88rpx);
 }
 
 .notification-item {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px;
+  gap: 24rpx;
+  padding: 32rpx;
   background: #ffffff;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 2rpx solid #f0f0f0;
 }
 
 .notification-item.unread {
@@ -167,12 +172,12 @@ const handleNotificationClick = (notification: any) => {
 }
 
 .notification-icon {
-  width: 40px;
-  height: 40px;
+  width: 80rpx;
+  height: 80rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: 40rpx;
   border-radius: 50%;
   flex-shrink: 0;
 }
@@ -198,10 +203,10 @@ const handleNotificationClick = (notification: any) => {
 }
 
 .notification-text {
-  font-size: 14px;
+  font-size: 28rpx;
   line-height: 1.5;
   color: #333;
-  margin-bottom: 4px;
+  margin-bottom: 8rpx;
 }
 
 .notification-user {
@@ -214,23 +219,23 @@ const handleNotificationClick = (notification: any) => {
 }
 
 .notification-time {
-  font-size: 12px;
+  font-size: 24rpx;
   color: #999;
 }
 
 .notification-thumbnail {
-  width: 50px;
-  height: 50px;
-  border-radius: 4px;
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 8rpx;
   flex-shrink: 0;
 }
 
 .unread-dot {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 8px;
-  height: 8px;
+  top: 32rpx;
+  right: 32rpx;
+  width: 16rpx;
+  height: 16rpx;
   background: #ff4d4f;
   border-radius: 50%;
 }

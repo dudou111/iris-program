@@ -13,7 +13,12 @@
 
       <view class="form-item">
         <text class="form-label">昵称</text>
-        <input class="form-input" placeholder="请输入昵称" value="用户昵称" />
+        <input class="form-input" placeholder="请输入昵称" value="用户昵称" /
+            :adjust-position="true"
+            :hold-keyboard="false"
+            :cursor-spacing="50"
+            placeholder-style="color: #999;"
+          >
       </view>
 
       <view class="form-item">
@@ -24,7 +29,12 @@
 
       <view class="form-item">
         <text class="form-label">个性签名</text>
-        <input class="form-input" placeholder="请输入个性签名" />
+        <input class="form-input" placeholder="请输入个性签名" /
+            :adjust-position="true"
+            :hold-keyboard="false"
+            :cursor-spacing="50"
+            placeholder-style="color: #999;"
+          >
       </view>
     </view>
 
@@ -37,41 +47,46 @@ const handleSave = () => {
   uni.showToast({
     title: '保存成功',
     icon: 'success'
-  })
+  ,
+      duration: 2000
+    })
 }
 </script>
 
 <style scoped>
+/* 已优化为跨平台样式，使用rpx单位 */
+/* 使用 #ifdef H5 / #ifdef MP 添加平台特定样式 */
+
 .edit-profile-page {
   min-height: 100vh;
   background: #f8f8f8;
 }
 
 .header {
-  height: 44px;
-  padding: 0 16px;
+  height: 88rpx;
+  padding: 0 32rpx;
   background: #ffffff;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 2rpx solid #e5e5e5;
 }
 
 .title {
-  font-size: 18px;
+  font-size: 36rpx;
   font-weight: 500;
   color: #333;
 }
 
 .form-list {
-  margin-top: 12px;
+  margin-top: 24rpx;
   background: #ffffff;
 }
 
 .form-item {
-  padding: 16px;
+  padding: 32rpx;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 2rpx solid #f0f0f0;
 }
 
 .form-item:last-child {
@@ -79,45 +94,45 @@ const handleSave = () => {
 }
 
 .form-label {
-  width: 80px;
-  font-size: 15px;
+  width: 160rpx;
+  font-size: 30rpx;
   color: #333;
 }
 
 .form-input {
   flex: 1;
-  font-size: 15px;
+  font-size: 30rpx;
   color: #333;
   text-align: right;
 }
 
 .form-value {
   flex: 1;
-  font-size: 15px;
+  font-size: 30rpx;
   color: #666;
   text-align: right;
 }
 
 .avatar {
-  width: 48px;
-  height: 48px;
+  width: 96rpx;
+  height: 96rpx;
   border-radius: 50%;
   margin-left: auto;
-  margin-right: 8px;
+  margin-right: 16rpx;
 }
 
 .form-arrow {
-  font-size: 24px;
+  font-size: 48rpx;
   color: #ccc;
 }
 
 .save-btn {
-  margin: 24px 16px;
-  padding: 12px;
-  font-size: 16px;
+  margin: 48rpx 32rpx;
+  padding: 24rpx;
+  font-size: 32rpx;
   color: #ffffff;
   background: #1890ff;
-  border-radius: 8px;
+  border-radius: 16rpx;
   text-align: center;
 }
 </style>

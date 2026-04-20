@@ -154,11 +154,18 @@ const handleFollow = () => {
   uni.showToast({
     title: user.value.isFollowing ? '关注成功' : '取消关注',
     icon: 'success'
-  })
+  ,
+      duration: 2000
+    })
 }
 
 const handleMessage = () => {
-  uni.navigateTo({ url: '/pages/chat/chat' })
+  uni.navigateTo({
+    url: '/pages/chat/chat',
+    fail: (err) => {
+      console.error('页面跳转失败:', err)
+    }
+  })
 }
 
 const handlePostClick = (post: any) => {
@@ -167,6 +174,9 @@ const handlePostClick = (post: any) => {
 </script>
 
 <style scoped>
+/* 已优化为跨平台样式，使用rpx单位 */
+/* 使用 #ifdef H5 / #ifdef MP 添加平台特定样式 */
+
 .user-profile-page {
   min-height: 100vh;
   background: #f8f8f8;
@@ -175,50 +185,50 @@ const handlePostClick = (post: any) => {
 .header {
   position: sticky;
   top: 0;
-  height: 44px;
-  padding: 0 16px;
+  height: 88rpx;
+  padding: 0 32rpx;
   background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 2rpx solid #e5e5e5;
   z-index: 100;
 }
 
 .title {
   flex: 1;
   text-align: center;
-  font-size: 18px;
+  font-size: 36rpx;
   font-weight: 500;
   color: #333;
 }
 
 .icon-btn {
-  width: 32px;
-  height: 32px;
+  width: 64rpx;
+  height: 64rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 48rpx;
   color: #666;
 }
 
 .user-card {
   background: #ffffff;
-  padding: 20px 16px;
-  margin-bottom: 8px;
+  padding: 40rpx 32rpx;
+  margin-bottom: 16rpx;
 }
 
 .user-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: 24rpx;
+  margin-bottom: 24rpx;
 }
 
 .user-avatar {
-  width: 80px;
-  height: 80px;
+  width: 160rpx;
+  height: 160rpx;
   border-radius: 50%;
 }
 
@@ -227,31 +237,31 @@ const handlePostClick = (post: any) => {
 }
 
 .user-name {
-  font-size: 20px;
+  font-size: 40rpx;
   font-weight: 500;
   color: #333;
-  margin-bottom: 4px;
+  margin-bottom: 8rpx;
 }
 
 .user-id {
-  font-size: 13px;
+  font-size: 26rpx;
   color: #999;
 }
 
 .user-bio {
-  font-size: 14px;
+  font-size: 28rpx;
   line-height: 1.5;
   color: #666;
-  margin-bottom: 16px;
+  margin-bottom: 32rpx;
 }
 
 .user-stats {
   display: flex;
   justify-content: space-around;
-  padding: 16px 0;
-  border-top: 1px solid #f0f0f0;
-  border-bottom: 1px solid #f0f0f0;
-  margin-bottom: 16px;
+  padding: 32rpx 0;
+  border-top: 2rpx solid #f0f0f0;
+  border-bottom: 2rpx solid #f0f0f0;
+  margin-bottom: 32rpx;
 }
 
 .stat-item {
@@ -259,32 +269,32 @@ const handlePostClick = (post: any) => {
 }
 
 .stat-value {
-  font-size: 20px;
+  font-size: 40rpx;
   font-weight: 500;
   color: #333;
-  margin-bottom: 4px;
+  margin-bottom: 8rpx;
 }
 
 .stat-label {
-  font-size: 12px;
+  font-size: 24rpx;
   color: #999;
 }
 
 .user-actions {
   display: flex;
-  gap: 12px;
+  gap: 24rpx;
 }
 
 .btn-follow,
 .btn-message {
   flex: 1;
-  height: 40px;
+  height: 80rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  font-size: 15px;
-  border-radius: 8px;
+  gap: 8rpx;
+  font-size: 30rpx;
+  border-radius: 16rpx;
 }
 
 .btn-follow {
@@ -305,15 +315,15 @@ const handlePostClick = (post: any) => {
 .content-tabs {
   display: flex;
   background: #ffffff;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 2rpx solid #e5e5e5;
 }
 
 .content-tab {
   position: relative;
   flex: 1;
-  padding: 12px 0;
+  padding: 24rpx 0;
   text-align: center;
-  font-size: 15px;
+  font-size: 30rpx;
   color: #666;
 }
 
@@ -328,32 +338,32 @@ const handlePostClick = (post: any) => {
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 40px;
-  height: 2px;
+  width: 80rpx;
+  height: 4rpx;
   background: #1890ff;
 }
 
 .post-list {
-  padding: 8px 0;
+  padding: 16rpx 0;
 }
 
 .card-post {
   background: #ffffff;
-  padding: 16px;
-  margin-bottom: 8px;
+  padding: 32rpx;
+  margin-bottom: 16rpx;
 }
 
 .card-post-content {
-  font-size: 14px;
+  font-size: 28rpx;
   line-height: 1.6;
   color: #333;
-  margin-bottom: 12px;
+  margin-bottom: 24rpx;
 }
 
 .card-post-images {
   display: grid;
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: 16rpx;
+  margin-bottom: 24rpx;
 }
 
 .card-post-images.single {
@@ -371,7 +381,7 @@ const handlePostClick = (post: any) => {
 .card-post-image {
   width: 100%;
   aspect-ratio: 1;
-  border-radius: 8px;
+  border-radius: 16rpx;
 }
 
 .card-post-footer {
@@ -381,19 +391,19 @@ const handlePostClick = (post: any) => {
 }
 
 .post-time {
-  font-size: 12px;
+  font-size: 24rpx;
   color: #999;
 }
 
 .post-stats {
   display: flex;
-  gap: 16px;
-  font-size: 12px;
+  gap: 32rpx;
+  font-size: 24rpx;
   color: #999;
 }
 
 .collection-list {
-  padding: 40px 16px;
+  padding: 80rpx 32rpx;
 }
 
 .empty-state {
@@ -401,16 +411,16 @@ const handlePostClick = (post: any) => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px 0;
+  padding: 80rpx 0;
   color: #999;
 }
 
 .empty-icon {
-  font-size: 48px;
-  margin-bottom: 12px;
+  font-size: 96rpx;
+  margin-bottom: 24rpx;
 }
 
 .empty-text {
-  font-size: 14px;
+  font-size: 28rpx;
 }
 </style>

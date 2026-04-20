@@ -70,12 +70,19 @@ const messages = ref([
 ])
 
 const handleSettings = () => {
-  uni.showToast({ title: '设置功能开发中', icon: 'none' })
+  uni.showToast({ title: '设置功能开发中', icon: 'none' ,
+      duration: 2000
+    })
 }
 
 const handleItemClick = (item: any) => {
   if (item.isSystem) {
-    uni.navigateTo({ url: '/pages/notification/notification' })
+    uni.navigateTo({
+    url: '/pages/notification/notification',
+    fail: (err) => {
+      console.error('页面跳转失败:', err)
+    }
+  })
   } else {
     uni.navigateTo({ url: `/pages/chat/chat?id=${item.id}` })
   }
@@ -83,6 +90,9 @@ const handleItemClick = (item: any) => {
 </script>
 
 <style scoped>
+/* 已优化为跨平台样式，使用rpx单位 */
+/* 使用 #ifdef H5 / #ifdef MP 添加平台特定样式 */
+
 .message-page {
   min-height: 100vh;
   background: #f8f8f8;
@@ -91,43 +101,43 @@ const handleItemClick = (item: any) => {
 .header {
   position: sticky;
   top: 0;
-  height: 44px;
-  padding: 0 16px;
+  height: 88rpx;
+  padding: 0 32rpx;
   background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 2rpx solid #e5e5e5;
   z-index: 100;
 }
 
 .title {
-  font-size: 18px;
+  font-size: 36rpx;
   font-weight: 500;
   color: #333;
 }
 
 .icon-btn {
-  width: 32px;
-  height: 32px;
+  width: 64rpx;
+  height: 64rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: 40rpx;
   color: #666;
 }
 
 .message-list {
-  height: calc(100vh - 44px);
+  height: calc(100vh - 88rpx);
   background: #ffffff;
 }
 
 .message-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  border-bottom: 1px solid #f0f0f0;
+  gap: 24rpx;
+  padding: 24rpx 32rpx;
+  border-bottom: 2rpx solid #f0f0f0;
 }
 
 .message-item:active {
@@ -140,8 +150,8 @@ const handleItemClick = (item: any) => {
 }
 
 .avatar-img {
-  width: 48px;
-  height: 48px;
+  width: 96rpx;
+  height: 96rpx;
   border-radius: 50%;
 }
 
@@ -149,11 +159,11 @@ const handleItemClick = (item: any) => {
   position: absolute;
   top: 0;
   right: 0;
-  width: 8px;
-  height: 8px;
+  width: 16rpx;
+  height: 16rpx;
   background: #ff4d4f;
   border-radius: 50%;
-  border: 2px solid #ffffff;
+  border: 4rpx solid #ffffff;
 }
 
 .message-content {
@@ -165,23 +175,23 @@ const handleItemClick = (item: any) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 4px;
+  margin-bottom: 8rpx;
 }
 
 .message-name {
-  font-size: 15px;
+  font-size: 30rpx;
   font-weight: 500;
   color: #333;
 }
 
 .message-time {
-  font-size: 12px;
+  font-size: 24rpx;
   color: #999;
   flex-shrink: 0;
 }
 
 .message-preview {
-  font-size: 13px;
+  font-size: 26rpx;
   color: #999;
   overflow: hidden;
   text-overflow: ellipsis;

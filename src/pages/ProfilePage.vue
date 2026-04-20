@@ -96,9 +96,12 @@ const handleMenuClick = (type: string) => {
 </script>
 
 <style scoped>
+/* 已优化为跨平台样式，使用rpx单位 */
+/* 使用 #ifdef H5 / #ifdef MP 添加平台特定样式 */
+
 .profile-page {
   min-height: 100vh;
-  padding-bottom: 50px;
+  padding-bottom: 100rpx;
   background: var(--color-bg-page);
 }
 
@@ -110,7 +113,7 @@ const handleMenuClick = (type: string) => {
 }
 
 .header-bg {
-  height: 120px;
+  height: 240rpx;
   background: var(--gradient-primary);
 }
 
@@ -118,8 +121,8 @@ const handleMenuClick = (type: string) => {
   position: absolute;
   top: var(--spacing-md);
   right: var(--spacing-md);
-  width: 24px;
-  height: 24px;
+  width: 48rpx;
+  height: 48rpx;
   color: var(--color-text-white);
   cursor: pointer;
 }
@@ -128,14 +131,14 @@ const handleMenuClick = (type: string) => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: -40px;
+  margin-top: -80rpx;
 }
 
 .profile-avatar {
-  width: 80px;
-  height: 80px;
+  width: 160rpx;
+  height: 160rpx;
   border-radius: var(--radius-round);
-  border: 4px solid var(--color-bg-white);
+  border: 8rpx solid var(--color-bg-white);
   object-fit: cover;
   margin-bottom: var(--spacing-sm);
 }
@@ -155,11 +158,11 @@ const handleMenuClick = (type: string) => {
 }
 
 .btn-edit {
-  padding: 6px 24px;
+  padding: 12rpx 48rpx;
   font-size: var(--font-size-sm);
   color: var(--color-primary);
   background: var(--color-bg-white);
-  border: 1px solid var(--color-primary);
+  border: 2rpx solid var(--color-primary);
   border-radius: var(--radius-full);
   cursor: pointer;
 }
@@ -199,7 +202,7 @@ const handleMenuClick = (type: string) => {
 .menu-item {
   display: flex;
   align-items: center;
-  height: 50px;
+  height: 100rpx;
   padding: 0 var(--spacing-md);
   border-bottom: var(--border-width-thin) solid var(--color-border-light);
   cursor: pointer;
@@ -215,7 +218,7 @@ const handleMenuClick = (type: string) => {
 }
 
 .menu-icon {
-  font-size: 20px;
+  font-size: 40rpx;
   margin-right: var(--spacing-md);
 }
 
@@ -226,7 +229,7 @@ const handleMenuClick = (type: string) => {
 }
 
 .menu-arrow {
-  font-size: 20px;
+  font-size: 40rpx;
   color: var(--color-text-tertiary);
 }
 </style>

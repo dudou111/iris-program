@@ -160,16 +160,19 @@ const handleJoin = (circle: any) => {
 </script>
 
 <style scoped>
+/* 已优化为跨平台样式，使用rpx单位 */
+/* 使用 #ifdef H5 / #ifdef MP 添加平台特定样式 */
+
 .circles-page {
   min-height: 100vh;
-  padding-bottom: 50px;
+  padding-bottom: 100rpx;
   background: var(--color-bg-page);
 }
 
 .header {
   position: sticky;
   top: 0;
-  height: 44px;
+  height: 88rpx;
   padding: 0 var(--page-padding);
   background: var(--color-bg-white);
   display: flex;
@@ -187,8 +190,8 @@ const handleJoin = (circle: any) => {
 }
 
 .icon-btn {
-  width: 24px;
-  height: 24px;
+  width: 48rpx;
+  height: 48rpx;
   color: var(--color-text-secondary);
   cursor: pointer;
 }
@@ -208,7 +211,7 @@ const handleJoin = (circle: any) => {
 
 .category-tab {
   flex-shrink: 0;
-  height: 32px;
+  height: 64rpx;
   padding: 0 var(--spacing-lg);
   display: flex;
   align-items: center;
@@ -241,12 +244,12 @@ const handleJoin = (circle: any) => {
 }
 
 .circle-card:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
 }
 
 .circle-cover {
-  width: 100px;
-  height: 100px;
+  width: 200rpx;
+  height: 200rpx;
   border-radius: var(--radius-md);
   object-fit: cover;
   flex-shrink: 0;
@@ -263,7 +266,7 @@ const handleJoin = (circle: any) => {
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-primary);
-  margin-bottom: 4px;
+  margin-bottom: 8rpx;
 }
 
 .circle-desc {
@@ -290,7 +293,7 @@ const handleJoin = (circle: any) => {
 
 .btn-join {
   align-self: center;
-  padding: 6px 20px;
+  padding: 12rpx 40rpx;
   font-size: var(--font-size-sm);
   color: var(--color-text-white);
   background: var(--color-primary);

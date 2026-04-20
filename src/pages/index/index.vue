@@ -13,6 +13,9 @@ const title = ref('Hello')
 </script>
 
 <style>
+/* 已优化为跨平台样式，使用rpx单位 */
+/* 使用 #ifdef H5 / #ifdef MP 添加平台特定样式 */
+
 .content {
   display: flex;
   flex-direction: column;

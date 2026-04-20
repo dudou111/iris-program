@@ -25,24 +25,24 @@
 
     <view class="menu-list">
       <view class="menu-item" @tap="goToMyPosts">
-        <text class="menu-icon">📝</text>
+        <Icon name="file-text" :size="20" color="#666" class="menu-icon" />
         <text class="menu-text">我的发布</text>
-        <text class="menu-arrow">›</text>
+        <Icon name="chevron-right" :size="20" color="#ccc" />
       </view>
       <view class="menu-item" @tap="goToMyCollections">
-        <text class="menu-icon">⭐</text>
+        <Icon name="star" :size="20" color="#666" class="menu-icon" />
         <text class="menu-text">我的收藏</text>
-        <text class="menu-arrow">›</text>
+        <Icon name="chevron-right" :size="20" color="#ccc" />
       </view>
       <view class="menu-item" @tap="goToEditProfile">
-        <text class="menu-icon">✏️</text>
+        <Icon name="edit" :size="20" color="#666" class="menu-icon" />
         <text class="menu-text">编辑资料</text>
-        <text class="menu-arrow">›</text>
+        <Icon name="chevron-right" :size="20" color="#ccc" />
       </view>
       <view class="menu-item" @tap="goToSettings">
-        <text class="menu-icon">⚙️</text>
+        <Icon name="settings" :size="20" color="#666" class="menu-icon" />
         <text class="menu-text">设置</text>
-        <text class="menu-arrow">›</text>
+        <Icon name="chevron-right" :size="20" color="#ccc" />
       </view>
     </view>
 
@@ -53,51 +53,85 @@
 
 <script setup lang="ts">
 import CustomTabBar from '@/components/custom-tab-bar/custom-tab-bar.vue'
+import Icon from '@/components/icon/icon.vue'
 
 const goToFollowing = () => {
-  uni.navigateTo({ url: '/pages/following/following' })
+  uni.navigateTo({
+    url: '/pages/following/following',
+    fail: (err) => {
+      console.error('页面跳转失败:', err)
+    }
+  })
 }
 
 const goToFollowers = () => {
-  uni.navigateTo({ url: '/pages/followers/followers' })
+  uni.navigateTo({
+    url: '/pages/followers/followers',
+    fail: (err) => {
+      console.error('页面跳转失败:', err)
+    }
+  })
 }
 
 const goToMyPosts = () => {
-  uni.navigateTo({ url: '/pages/my-posts/my-posts' })
+  uni.navigateTo({
+    url: '/pages/my-posts/my-posts',
+    fail: (err) => {
+      console.error('页面跳转失败:', err)
+    }
+  })
 }
 
 const goToMyCollections = () => {
-  uni.navigateTo({ url: '/pages/my-collections/my-collections' })
+  uni.navigateTo({
+    url: '/pages/my-collections/my-collections',
+    fail: (err) => {
+      console.error('页面跳转失败:', err)
+    }
+  })
 }
 
 const goToEditProfile = () => {
-  uni.navigateTo({ url: '/pages/edit-profile/edit-profile' })
+  uni.navigateTo({
+    url: '/pages/edit-profile/edit-profile',
+    fail: (err) => {
+      console.error('页面跳转失败:', err)
+    }
+  })
 }
 
 const goToSettings = () => {
-  uni.navigateTo({ url: '/pages/settings/settings' })
+  uni.navigateTo({
+    url: '/pages/settings/settings',
+    fail: (err) => {
+      console.error('页面跳转失败:', err)
+    }
+  })
 }
 </script>
 
 <style scoped>
+/* 已优化为跨平台样式，使用rpx单位 */
+/* 使用 #ifdef H5 / #ifdef MP 添加平台特定样式 */
+
 .profile-page {
   min-height: 100vh;
   background: #f8f8f8;
 }
 
 .profile-header {
-  padding: 24px 16px;
+  padding: 48rpx 32rpx;
   background: #ffffff;
   display: flex;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 24rpx;
 }
 
 .avatar {
-  width: 64px;
-  height: 64px;
+  width: 128rpx;
+  height: 128rpx;
   border-radius: 50%;
-  margin-right: 16px;
+  margin-right: 32rpx;
 }
 
 .user-info {
@@ -105,23 +139,23 @@ const goToSettings = () => {
 }
 
 .username {
-  font-size: 18px;
+  font-size: 36rpx;
   font-weight: 500;
   color: #333;
-  margin-bottom: 4px;
+  margin-bottom: 8rpx;
 }
 
 .user-id {
-  font-size: 14px;
+  font-size: 28rpx;
   color: #999;
 }
 
 .stats {
-  padding: 16px;
+  padding: 32rpx;
   background: #ffffff;
   display: flex;
   justify-content: space-around;
-  margin-bottom: 12px;
+  margin-bottom: 24rpx;
 }
 
 .stat-item {
@@ -129,14 +163,14 @@ const goToSettings = () => {
 }
 
 .stat-value {
-  font-size: 20px;
+  font-size: 40rpx;
   font-weight: 500;
   color: #333;
-  margin-bottom: 4px;
+  margin-bottom: 8rpx;
 }
 
 .stat-label {
-  font-size: 14px;
+  font-size: 28rpx;
   color: #666;
 }
 
@@ -145,10 +179,10 @@ const goToSettings = () => {
 }
 
 .menu-item {
-  padding: 16px;
+  padding: 32rpx;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 2rpx solid #f0f0f0;
 }
 
 .menu-item:last-child {
@@ -156,18 +190,14 @@ const goToSettings = () => {
 }
 
 .menu-icon {
-  font-size: 20px;
-  margin-right: 12px;
+  margin-right: 24rpx;
+  display: flex;
+  align-items: center;
 }
 
 .menu-text {
   flex: 1;
-  font-size: 15px;
+  font-size: 30rpx;
   color: #333;
-}
-
-.menu-arrow {
-  font-size: 24px;
-  color: #ccc;
 }
 </style>

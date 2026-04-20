@@ -52,7 +52,9 @@ const handleBack = () => {
 }
 
 const handleShare = () => {
-  uni.showToast({ title: '分享功能开发中', icon: 'none' })
+  uni.showToast({ title: '分享功能开发中', icon: 'none' ,
+      duration: 2000
+    })
 }
 
 const handleRegister = () => {
@@ -65,51 +67,56 @@ const handleRegister = () => {
   uni.showToast({
     title: activity.value.isRegistered ? '报名成功' : '取消报名',
     icon: 'success'
-  })
+  ,
+      duration: 2000
+    })
 }
 </script>
 
 <style scoped>
+/* 已优化为跨平台样式，使用rpx单位 */
+/* 使用 #ifdef H5 / #ifdef MP 添加平台特定样式 */
+
 .activity-detail-page {
   min-height: 100vh;
-  padding-bottom: 70px;
+  padding-bottom: 140rpx;
   background: #f8f8f8;
 }
 
 .header {
   position: sticky;
   top: 0;
-  height: 44px;
-  padding: 0 16px;
+  height: 88rpx;
+  padding: 0 32rpx;
   background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 2rpx solid #e5e5e5;
   z-index: 100;
 }
 
 .title {
   flex: 1;
   text-align: center;
-  font-size: 18px;
+  font-size: 36rpx;
   font-weight: 500;
   color: #333;
 }
 
 .icon-btn {
-  width: 32px;
-  height: 32px;
+  width: 64rpx;
+  height: 64rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 48rpx;
   color: #666;
 }
 
 .activity-cover {
   width: 100%;
-  height: 240px;
+  height: 480rpx;
   background: #f0f0f0;
 }
 
@@ -120,30 +127,30 @@ const handleRegister = () => {
 
 .activity-info {
   background: #ffffff;
-  padding: 16px;
+  padding: 32rpx;
 }
 
 .activity-title {
-  font-size: 20px;
+  font-size: 40rpx;
   font-weight: 500;
   color: #333;
-  margin-bottom: 12px;
+  margin-bottom: 24rpx;
 }
 
 .activity-meta {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 16rpx;
+  margin-bottom: 32rpx;
 }
 
 .meta-item {
-  font-size: 14px;
+  font-size: 28rpx;
   color: #666;
 }
 
 .activity-desc {
-  font-size: 14px;
+  font-size: 28rpx;
   line-height: 1.6;
   color: #666;
 }
@@ -153,24 +160,24 @@ const handleRegister = () => {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 60px;
-  padding: 8px 16px;
+  height: 120rpx;
+  padding: 16rpx 32rpx;
   background: #ffffff;
-  border-top: 1px solid #e5e5e5;
+  border-top: 2rpx solid #e5e5e5;
   z-index: 100;
 }
 
 .btn-register {
   width: 100%;
-  height: 44px;
+  height: 88rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 32rpx;
   font-weight: 500;
   color: #ffffff;
   background: #1890ff;
-  border-radius: 8px;
+  border-radius: 16rpx;
 }
 
 .btn-register.registered {

@@ -60,6 +60,8 @@ const handlePublish = () => {
     uni.showToast({
       title: '请输入内容',
       icon: 'none'
+    ,
+      duration: 2000
     })
     return
   }
@@ -67,7 +69,9 @@ const handlePublish = () => {
   uni.showToast({
     title: '发布成功',
     icon: 'success'
-  })
+  ,
+      duration: 2000
+    })
 
   setTimeout(() => {
     uni.navigateBack()
@@ -95,40 +99,43 @@ const onTopicChange = (e: any) => {
 </script>
 
 <style scoped>
+/* 已优化为跨平台样式，使用rpx单位 */
+/* 使用 #ifdef H5 / #ifdef MP 添加平台特定样式 */
+
 .publish-page {
   min-height: 100vh;
   background: #ffffff;
 }
 
 .header {
-  height: 44px;
-  padding: 0 16px;
+  height: 88rpx;
+  padding: 0 32rpx;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 2rpx solid #e5e5e5;
 }
 
 .cancel-btn,
 .publish-btn {
-  font-size: 16px;
+  font-size: 32rpx;
   color: #1890ff;
 }
 
 .title {
-  font-size: 18px;
+  font-size: 36rpx;
   font-weight: 500;
   color: #333;
 }
 
 .content {
-  padding: 16px;
+  padding: 32rpx;
 }
 
 .textarea {
   width: 100%;
-  min-height: 200px;
-  font-size: 16px;
+  min-height: 400rpx;
+  font-size: 32rpx;
   line-height: 1.6;
 }
 
@@ -136,68 +143,68 @@ const onTopicChange = (e: any) => {
   display: flex;
   flex-wrap: wrap;
   
-  margin-top: 16px;
+  margin-top: 32rpx;
 }
 
 .image-item {
   position: relative;
-  width: 100px;
-  height: 100px;
+  width: 200rpx;
+  height: 200rpx;
 }
 
 .image {
   width: 100%;
   height: 100%;
-  border-radius: 8px;
+  border-radius: 16rpx;
 }
 
 .delete-btn {
   position: absolute;
-  top: -8px;
-  right: -8px;
-  width: 24px;
-  height: 24px;
+  top: -16rpx;
+  right: -16rpx;
+  width: 48rpx;
+  height: 48rpx;
   background: #ff4d4f;
   color: #ffffff;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: 40rpx;
 }
 
 .add-image {
-  width: 100px;
-  height: 100px;
-  border: 1px dashed #d9d9d9;
-  border-radius: 8px;
+  width: 200rpx;
+  height: 200rpx;
+  border: 2rpx dashed #d9d9d9;
+  border-radius: 16rpx;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .add-icon {
-  font-size: 32px;
+  font-size: 64rpx;
   color: #999;
 }
 
 .topic-selector {
-  margin-top: 24px;
+  margin-top: 48rpx;
   display: flex;
   align-items: center;
 }
 
 .label {
-  font-size: 15px;
+  font-size: 30rpx;
   color: #666;
-  margin-right: 8px;
+  margin-right: 16rpx;
 }
 
 .picker {
-  padding: 8px 16px;
+  padding: 16rpx 32rpx;
   background: #f5f5f5;
-  border-radius: 16px;
-  font-size: 14px;
+  border-radius: 32rpx;
+  font-size: 28rpx;
   color: #333;
 }
 </style>

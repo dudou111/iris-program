@@ -62,64 +62,67 @@ const goToCircleDetail = (id: number) => {
 </script>
 
 <style scoped>
+/* 已优化为跨平台样式，使用rpx单位 */
+/* 使用 #ifdef H5 / #ifdef MP 添加平台特定样式 */
+
 .circles-page {
   min-height: 100vh;
   background: #f8f8f8;
 }
 
 .header {
-  height: 44px;
-  padding: 0 16px;
+  height: 88rpx;
+  padding: 0 32rpx;
   background: #ffffff;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 2rpx solid #e5e5e5;
 }
 
 .title {
-  font-size: 18px;
+  font-size: 36rpx;
   font-weight: 500;
   color: #333;
 }
 
 .circle-list {
-  height: calc(100vh - 44px);
-  padding: 12px;
+  height: calc(100vh - 88rpx);
+  padding: 24rpx;
 }
 
 .circle-card {
-  margin-bottom: 12px;
+  margin-bottom: 24rpx;
   background: #ffffff;
-  border-radius: 8px;
+  border-radius: 16rpx;
   overflow: hidden;
 }
 
 .circle-cover {
   width: 100%;
-  height: 150px;
+  height: 300rpx;
 }
 
 .circle-info {
-  padding: 12px;
+  padding: 24rpx;
 }
 
 .circle-name {
-  font-size: 16px;
+  font-size: 32rpx;
   font-weight: 500;
   color: #333;
-  margin-bottom: 4px;
+  margin-bottom: 8rpx;
 }
 
 .circle-desc {
-  font-size: 14px;
+  font-size: 28rpx;
   color: #666;
-  margin-bottom: 8px;
+  margin-bottom: 16rpx;
 }
 
 .circle-meta {
   display: flex;
   
-  font-size: 12px;
+  font-size: 24rpx;
   color: #999;
 }
 </style>

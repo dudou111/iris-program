@@ -232,16 +232,19 @@ const handlePublish = () => {
 </script>
 
 <style scoped>
+/* 已优化为跨平台样式，使用rpx单位 */
+/* 使用 #ifdef H5 / #ifdef MP 添加平台特定样式 */
+
 .home-page {
   min-height: 100vh;
-  padding-bottom: 50px;
+  padding-bottom: 100rpx;
   background: var(--color-bg-page);
 }
 
 .header {
   position: sticky;
   top: 0;
-  height: 44px;
+  height: 88rpx;
   padding: 0 var(--page-padding);
   background: var(--color-bg-white);
   display: flex;
@@ -258,7 +261,7 @@ const handlePublish = () => {
 }
 
 .logo {
-  font-size: 24px;
+  font-size: 48rpx;
 }
 
 .title {
@@ -275,21 +278,21 @@ const handlePublish = () => {
 
 .icon-btn {
   position: relative;
-  width: 24px;
-  height: 24px;
+  width: 48rpx;
+  height: 48rpx;
   color: var(--color-text-secondary);
   cursor: pointer;
 }
 
 .badge-dot {
   position: absolute;
-  top: -2px;
-  right: -2px;
-  width: 8px;
-  height: 8px;
+  top: -4rpx;
+  right: -4rpx;
+  width: 16rpx;
+  height: 16rpx;
   background: var(--color-badge);
   border-radius: var(--radius-round);
-  border: 2px solid var(--color-bg-white);
+  border: 4rpx solid var(--color-bg-white);
 }
 
 .topic-tabs {
@@ -307,7 +310,7 @@ const handlePublish = () => {
 
 .topic-tab {
   flex-shrink: 0;
-  height: 28px;
+  height: 56rpx;
   padding: 0 var(--spacing-md);
   display: flex;
   align-items: center;
@@ -331,16 +334,16 @@ const handlePublish = () => {
 .fab {
   position: fixed;
   right: var(--page-padding);
-  bottom: 70px;
-  width: 56px;
-  height: 56px;
+  bottom: 140rpx;
+  width: 112rpx;
+  height: 112rpx;
   background: var(--color-primary);
   border-radius: var(--radius-round);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--color-text-white);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.15);
   cursor: pointer;
   z-index: var(--z-index-fixed);
   transition: all var(--duration-fast) var(--ease-out);
@@ -348,7 +351,7 @@ const handlePublish = () => {
 
 .fab:hover {
   transform: scale(1.05);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 12rpx 32rpx rgba(0, 0, 0, 0.2);
 }
 
 .fab:active {

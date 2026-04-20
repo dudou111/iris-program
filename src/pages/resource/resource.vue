@@ -6,12 +6,17 @@
 
     <scroll-view class="resource-list" scroll-y>
       <view v-for="resource in resources" :key="resource.id" class="resource-card" @tap="goToResourceDetail(resource.id)">
-        <view class="resource-icon">📚</view>
+        <view class="resource-icon">
+          <Icon name="book" :size="32" color="#1890ff" />
+        </view>
         <view class="resource-info">
           <view class="resource-name">{{ resource.name }}</view>
           <view class="resource-desc">{{ resource.description }}</view>
           <view class="resource-meta">
-            <text>{{ resource.downloads }} 下载</text>
+            <view class="meta-item">
+              <Icon name="download" :size="12" color="#999" />
+              <text>{{ resource.downloads }} 下载</text>
+            </view>
             <text>{{ resource.size }}</text>
           </view>
         </view>
@@ -26,6 +31,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import CustomTabBar from '@/components/custom-tab-bar/custom-tab-bar.vue'
+import Icon from '@/components/icon/icon.vue'
 
 const resources = ref([
   {
@@ -59,48 +65,50 @@ const goToResourceDetail = (id: number) => {
 </script>
 
 <style scoped>
+/* 已优化为跨平台样式，使用rpx单位 */
+/* 使用 #ifdef H5 / #ifdef MP 添加平台特定样式 */
+
 .resource-page {
   min-height: 100vh;
   background: #f8f8f8;
 }
 
 .header {
-  height: 44px;
-  padding: 0 16px;
+  height: 88rpx;
+  padding: 0 32rpx;
   background: #ffffff;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 2rpx solid #e5e5e5;
 }
 
 .title {
-  font-size: 18px;
+  font-size: 36rpx;
   font-weight: 500;
   color: #333;
 }
 
 .resource-list {
-  height: calc(100vh - 44px);
-  padding: 12px;
+  height: calc(100vh - 88rpx);
+  padding: 24rpx;
 }
 
 .resource-card {
-  margin-bottom: 12px;
-  padding: 16px;
+  margin-bottom: 24rpx;
+  padding: 32rpx;
   background: #ffffff;
-  border-radius: 8px;
+  border-radius: 16rpx;
   display: flex;
   align-items: center;
 }
 
 .resource-icon {
-  width: 48px;
-  height: 48px;
-  font-size: 32px;
+  width: 96rpx;
+  height: 96rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 12px;
+  margin-right: 24rpx;
 }
 
 .resource-info {
@@ -108,22 +116,28 @@ const goToResourceDetail = (id: number) => {
 }
 
 .resource-name {
-  font-size: 16px;
+  font-size: 32rpx;
   font-weight: 500;
   color: #333;
-  margin-bottom: 4px;
+  margin-bottom: 8rpx;
 }
 
 .resource-desc {
-  font-size: 14px;
+  font-size: 28rpx;
   color: #666;
-  margin-bottom: 8px;
+  margin-bottom: 16rpx;
 }
 
 .resource-meta {
   display: flex;
-  
-  font-size: 12px;
+  gap: 24rpx;
+  font-size: 24rpx;
   color: #999;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
 }
 </style>

@@ -39,7 +39,12 @@
             multiple
             style="display: none"
             @change="handleFileChange"
-          />
+          /
+            :adjust-position="true"
+            :hold-keyboard="false"
+            :cursor-spacing="50"
+            placeholder-style="color: #999;"
+          >
           <Plus :size="32" />
           <span class="image-add-text">{{ images.length }}/9</span>
         </view>
@@ -302,13 +307,16 @@ const selectVisibility = (value: string) => {
 </script>
 
 <style scoped>
+/* 已优化为跨平台样式，使用rpx单位 */
+/* 使用 #ifdef H5 / #ifdef MP 添加平台特定样式 */
+
 .publish-page {
   min-height: 100vh;
   background: var(--color-bg-white);
 }
 
 .header {
-  height: 44px;
+  height: 88rpx;
   padding: 0 var(--page-padding);
   display: flex;
   align-items: center;
@@ -332,7 +340,7 @@ const selectVisibility = (value: string) => {
 
 .textarea-base {
   width: 100%;
-  min-height: 200px;
+  min-height: 400rpx;
   padding: var(--spacing-md);
   border: none;
   font-size: var(--font-size-base);
@@ -343,8 +351,8 @@ const selectVisibility = (value: string) => {
 
 .char-count {
   position: absolute;
-  bottom: 8px;
-  right: 12px;
+  bottom: 16rpx;
+  right: 24rpx;
   font-size: var(--font-size-xs);
   color: var(--color-text-tertiary);
 }
@@ -371,10 +379,10 @@ const selectVisibility = (value: string) => {
 
 .image-delete {
   position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 24px;
-  height: 24px;
+  top: 8rpx;
+  right: 8rpx;
+  width: 48rpx;
+  height: 48rpx;
   background: rgba(0, 0, 0, 0.6);
   color: white;
   border-radius: var(--radius-round);
@@ -391,7 +399,7 @@ const selectVisibility = (value: string) => {
 
 .image-add {
   aspect-ratio: 1;
-  border: 2px dashed var(--color-border-base);
+  border: 4rpx dashed var(--color-border-base);
   border-radius: var(--radius-sm);
   display: flex;
   flex-direction: column;
@@ -430,7 +438,7 @@ const selectVisibility = (value: string) => {
 }
 
 .topic-chip {
-  height: 32px;
+  height: 64rpx;
   padding: 0 var(--spacing-md);
   display: flex;
   align-items: center;
@@ -456,7 +464,7 @@ const selectVisibility = (value: string) => {
   display: flex;
   align-items: center;
   
-  height: 50px;
+  height: 100rpx;
   padding: 0 var(--spacing-md);
   border-bottom: var(--border-width-thin) solid var(--color-border-base);
   cursor: pointer;
@@ -532,7 +540,7 @@ const selectVisibility = (value: string) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 50px;
+  height: 100rpx;
   padding: 0 var(--page-padding);
   border-bottom: var(--border-width-thin) solid var(--color-border-base);
 }
@@ -544,8 +552,8 @@ const selectVisibility = (value: string) => {
 }
 
 .modal-close {
-  width: 32px;
-  height: 32px;
+  width: 64rpx;
+  height: 64rpx;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -560,7 +568,7 @@ const selectVisibility = (value: string) => {
 }
 
 .modal-body {
-  max-height: calc(70vh - 50px);
+  max-height: calc(70vh - 100rpx);
   overflow-y: auto;
   padding: var(--spacing-sm) 0;
 }
@@ -570,7 +578,7 @@ const selectVisibility = (value: string) => {
   display: flex;
   align-items: center;
   
-  height: 50px;
+  height: 100rpx;
   padding: 0 var(--page-padding);
   cursor: pointer;
   transition: background var(--duration-fast) var(--ease-out);
@@ -605,7 +613,7 @@ const selectVisibility = (value: string) => {
 .visibility-label {
   font-size: var(--font-size-base);
   color: var(--color-text-primary);
-  margin-bottom: 2px;
+  margin-bottom: 4rpx;
 }
 
 .visibility-desc {

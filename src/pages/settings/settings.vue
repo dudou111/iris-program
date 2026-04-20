@@ -46,7 +46,9 @@ const handleLogout = () => {
         uni.showToast({
           title: '已退出',
           icon: 'success'
-        })
+        ,
+      duration: 2000
+    })
       }
     }
   })
@@ -54,36 +56,39 @@ const handleLogout = () => {
 </script>
 
 <style scoped>
+/* 已优化为跨平台样式，使用rpx单位 */
+/* 使用 #ifdef H5 / #ifdef MP 添加平台特定样式 */
+
 .settings-page {
   min-height: 100vh;
   background: #f8f8f8;
 }
 
 .header {
-  height: 44px;
-  padding: 0 16px;
+  height: 88rpx;
+  padding: 0 32rpx;
   background: #ffffff;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 2rpx solid #e5e5e5;
 }
 
 .title {
-  font-size: 18px;
+  font-size: 36rpx;
   font-weight: 500;
   color: #333;
 }
 
 .menu-list {
-  margin-top: 12px;
+  margin-top: 24rpx;
   background: #ffffff;
 }
 
 .menu-item {
-  padding: 16px;
+  padding: 32rpx;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 2rpx solid #f0f0f0;
 }
 
 .menu-item:last-child {
@@ -92,28 +97,28 @@ const handleLogout = () => {
 
 .menu-text {
   flex: 1;
-  font-size: 15px;
+  font-size: 30rpx;
   color: #333;
 }
 
 .menu-value {
-  font-size: 14px;
+  font-size: 28rpx;
   color: #999;
-  margin-right: 8px;
+  margin-right: 16rpx;
 }
 
 .menu-arrow {
-  font-size: 24px;
+  font-size: 48rpx;
   color: #ccc;
 }
 
 .logout-btn {
-  margin: 24px 16px;
-  padding: 12px;
-  font-size: 16px;
+  margin: 48rpx 32rpx;
+  padding: 24rpx;
+  font-size: 32rpx;
   color: #ff4d4f;
   background: #ffffff;
-  border-radius: 8px;
+  border-radius: 16rpx;
   text-align: center;
 }
 </style>

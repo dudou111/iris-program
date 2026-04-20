@@ -9,8 +9,14 @@
         <image :src="activity.cover" class="activity-cover" mode="aspectFill" />
         <view class="activity-info">
           <view class="activity-name">{{ activity.name }}</view>
-          <view class="activity-time">⏰ {{ activity.time }}</view>
-          <view class="activity-location">📍 {{ activity.location }}</view>
+          <view class="activity-time">
+            <Icon name="clock" :size="14" color="#666" />
+            <text>{{ activity.time }}</text>
+          </view>
+          <view class="activity-location">
+            <Icon name="map-pin" :size="14" color="#666" />
+            <text>{{ activity.location }}</text>
+          </view>
           <view class="activity-meta">
             <text>{{ activity.participants }} 人参加</text>
           </view>
@@ -26,6 +32,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import CustomTabBar from '@/components/custom-tab-bar/custom-tab-bar.vue'
+import Icon from '@/components/icon/icon.vue'
 
 const activities = ref([
   {
@@ -62,64 +69,70 @@ const goToActivityDetail = (id: number) => {
 </script>
 
 <style scoped>
+/* 已优化为跨平台样式，使用rpx单位 */
+/* 使用 #ifdef H5 / #ifdef MP 添加平台特定样式 */
+
 .activities-page {
   min-height: 100vh;
   background: #f8f8f8;
 }
 
 .header {
-  height: 44px;
-  padding: 0 16px;
+  height: 88rpx;
+  padding: 0 32rpx;
   background: #ffffff;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 2rpx solid #e5e5e5;
 }
 
 .title {
-  font-size: 18px;
+  font-size: 36rpx;
   font-weight: 500;
   color: #333;
 }
 
 .activity-list {
-  height: calc(100vh - 44px);
-  padding: 12px;
+  height: calc(100vh - 88rpx);
+  padding: 24rpx;
 }
 
 .activity-card {
-  margin-bottom: 12px;
+  margin-bottom: 24rpx;
   background: #ffffff;
-  border-radius: 8px;
+  border-radius: 16rpx;
   overflow: hidden;
 }
 
 .activity-cover {
   width: 100%;
-  height: 150px;
+  height: 300rpx;
 }
 
 .activity-info {
-  padding: 12px;
+  padding: 24rpx;
 }
 
 .activity-name {
-  font-size: 16px;
+  font-size: 32rpx;
   font-weight: 500;
   color: #333;
-  margin-bottom: 8px;
+  margin-bottom: 16rpx;
 }
 
 .activity-time,
 .activity-location {
-  font-size: 14px;
+  font-size: 28rpx;
   color: #666;
-  margin-bottom: 4px;
+  margin-bottom: 8rpx;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
 }
 
 .activity-meta {
-  margin-top: 8px;
-  font-size: 12px;
+  margin-top: 16rpx;
+  font-size: 24rpx;
   color: #999;
 }
 </style>

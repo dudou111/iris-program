@@ -60,7 +60,9 @@ const handleBack = () => {
 }
 
 const handleShare = () => {
-  uni.showToast({ title: '分享功能开发中', icon: 'none' })
+  uni.showToast({ title: '分享功能开发中', icon: 'none' ,
+      duration: 2000
+    })
 }
 
 const handleCollect = () => {
@@ -68,56 +70,63 @@ const handleCollect = () => {
   uni.showToast({
     title: resource.value.isCollected ? '收藏成功' : '取消收藏',
     icon: 'success'
-  })
+  ,
+      duration: 2000
+    })
 }
 
 const handleDownload = () => {
-  uni.showToast({ title: '下载成功', icon: 'success' })
+  uni.showToast({ title: '下载成功', icon: 'success' ,
+      duration: 2000
+    })
   resource.value.downloads++
 }
 </script>
 
 <style scoped>
+/* 已优化为跨平台样式，使用rpx单位 */
+/* 使用 #ifdef H5 / #ifdef MP 添加平台特定样式 */
+
 .resource-detail-page {
   min-height: 100vh;
-  padding-bottom: 70px;
+  padding-bottom: 140rpx;
   background: #f8f8f8;
 }
 
 .header {
   position: sticky;
   top: 0;
-  height: 44px;
-  padding: 0 16px;
+  height: 88rpx;
+  padding: 0 32rpx;
   background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 2rpx solid #e5e5e5;
   z-index: 100;
 }
 
 .title {
   flex: 1;
   text-align: center;
-  font-size: 18px;
+  font-size: 36rpx;
   font-weight: 500;
   color: #333;
 }
 
 .icon-btn {
-  width: 32px;
-  height: 32px;
+  width: 64rpx;
+  height: 64rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 48rpx;
   color: #666;
 }
 
 .resource-cover {
   width: 100%;
-  height: 240px;
+  height: 480rpx;
   background: #f0f0f0;
 }
 
@@ -128,57 +137,57 @@ const handleDownload = () => {
 
 .resource-info {
   background: #ffffff;
-  padding: 16px;
-  margin-bottom: 8px;
+  padding: 32rpx;
+  margin-bottom: 16rpx;
 }
 
 .resource-title {
-  font-size: 20px;
+  font-size: 40rpx;
   font-weight: 500;
   color: #333;
-  margin-bottom: 12px;
+  margin-bottom: 24rpx;
 }
 
 .resource-meta {
   display: flex;
-  gap: 16px;
-  margin-bottom: 12px;
+  gap: 32rpx;
+  margin-bottom: 24rpx;
 }
 
 .meta-item {
-  font-size: 13px;
+  font-size: 26rpx;
   color: #999;
 }
 
 .resource-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 16rpx;
 }
 
 .tag {
-  padding: 4px 12px;
-  font-size: 12px;
+  padding: 8rpx 24rpx;
+  font-size: 24rpx;
   color: #1890ff;
   background: #e6f7ff;
-  border-radius: 12px;
+  border-radius: 24rpx;
 }
 
 .resource-description {
   background: #ffffff;
-  padding: 16px;
-  margin-bottom: 8px;
+  padding: 32rpx;
+  margin-bottom: 16rpx;
 }
 
 .section-title {
-  font-size: 16px;
+  font-size: 32rpx;
   font-weight: 500;
   color: #333;
-  margin-bottom: 12px;
+  margin-bottom: 24rpx;
 }
 
 .description-text {
-  font-size: 14px;
+  font-size: 28rpx;
   line-height: 1.6;
   color: #666;
 }
@@ -188,12 +197,12 @@ const handleDownload = () => {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 60px;
-  padding: 8px 16px;
+  height: 120rpx;
+  padding: 16rpx 32rpx;
   background: #ffffff;
-  border-top: 1px solid #e5e5e5;
+  border-top: 2rpx solid #e5e5e5;
   display: flex;
-  gap: 12px;
+  gap: 24rpx;
   z-index: 100;
 }
 
@@ -202,9 +211,9 @@ const handleDownload = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 44px;
-  font-size: 15px;
-  border-radius: 8px;
+  height: 88rpx;
+  font-size: 30rpx;
+  border-radius: 16rpx;
 }
 
 .btn-collect {
