@@ -1,0 +1,131 @@
+<template>
+  <view class="followers-page">
+    <view class="header">
+      <view class="icon-btn" @tap="handleBack">
+        <ChevronLeft :size="24" />
+      </view>
+      <view class="title">我的粉丝</view>
+      <view class="icon-btn"></view>
+    </view>
+
+    <view class="user-list">
+      <view v-for="user in users" :key="user.id" class="user-item" @tap="handleUserClick(user)">
+        <image :src="user.avatar" :alt="user.username" class="user-avatar" />
+        <view class="user-info">
+          <view class="user-name">{{ user.username }}</view>
+          <view class="user-bio">{{ user.bio }}</view>
+        </view>
+        <button class="btn-follow" :class="{ following: user.isFollowing }" @tap.stop="handleFollow(user)">
+          {{ user.isFollowing ? '已关注' : '关注' }}
+        </button>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+
+
+const users = ref([
+  { id: 1, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Fan1', username: '王同学', bio: '经济学院', isFollowing: false },
+  { id: 2, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Fan2', username: '刘同学', bio: '文学院', isFollowing: true }
+])
+
+const handleBack = () => uni.navigateBack()
+const handleUserClick = (user: any) => uni.navigateTo({ url: `/user/${user.id}`)
+const handleFollow = (user: any) => {
+  user.isFollowing = !user.isFollowing
+}
+</script>
+
+<style scoped>
+/* 已优化为跨平台样式，使用rpx单位 */
+/* 使用 #ifdef H5 / #ifdef MP 添加平台特定样式 */
+
+.followers-page {
+  min-height: 100vh;
+  background: var(--color-bg-page);
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  height: 88rpx;
+  padding: 0 var(--page-padding);
+  background: var(--color-bg-white);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: var(--border-width-thin) solid var(--color-border-base);
+  z-index: var(--z-index-sticky);
+}
+
+.title {
+  flex: 1;
+  text-align: center;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.icon-btn {
+  width: 48rpx;
+  height: 48rpx;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.user-list {
+  padding: var(--spacing-sm) var(--page-padding);
+}
+
+.user-item {
+  display: flex;
+  align-items: center;
+  
+  padding: var(--spacing-md);
+  background: var(--color-bg-white);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-sm);
+  cursor: pointer;
+}
+
+.user-avatar {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: var(--radius-round);
+  flex-shrink: 0;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.user-name {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  margin-bottom: 8rpx;
+}
+
+.user-bio {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+.btn-follow {
+  padding: 12rpx 32rpx;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-white);
+  background: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+}
+
+.btn-follow.following {
+  color: var(--color-text-secondary);
+  background: var(--color-bg-gray);
+}
+</style>
