@@ -1,5 +1,6 @@
 // API请求工具类
-let BASE_URL = 'http://localhost:3000'
+const SERVER_ORIGIN = 'http://127.0.0.1:3001'
+let BASE_URL = SERVER_ORIGIN
 
 // #ifdef H5
 BASE_URL = '/api'
@@ -20,12 +21,50 @@ interface ResponseData {
 }
 
 // 获取token
-function getToken(): string {
-  return uni.getStorageSync('token') || ''
+export function getToken(): string {
+  const token = uni.getStorageSync('token')
+
+  if (typeof token !== 'string') {
+    return ''
+  }
+
+  const normalized = token.trim()
+
+  if (!normalized || normalized === 'undefined' || normalized === 'null') {
+    uni.removeStorageSync('token')
+    return ''
+  }
+
+  return normalized
+}
+
+export function getBaseUrl(): string {
+  return BASE_URL
+}
+
+export function getServerOrigin(): string {
+  return SERVER_ORIGIN
+}
+
+export function getAuthHeader() {
+  const token = getToken()
+
+  if (!token) {
+    return {}
+  }
+
+  return {
+    Authorization: `Bearer ${token}`
+  }
 }
 
 // 设置token
 export function setToken(token: string) {
+  if (!token || token === 'undefined' || token === 'null') {
+    clearToken()
+    return
+  }
+
   uni.setStorageSync('token', token)
 }
 

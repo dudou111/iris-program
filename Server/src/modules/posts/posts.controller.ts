@@ -10,16 +10,40 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import type { Request as ExpressRequest } from 'express';
 
 @ApiTags('动态管理')
 @Controller('posts')
 export class PostsController {
-  constructor(private readonly postsService: PostsService) {}
+  constructor(
+    private readonly postsService: PostsService,
+    private readonly jwtService: JwtService,
+  ) {}
+
+  private getViewerId(req?: ExpressRequest & { user?: { id: string } }) {
+    if (req?.user?.id) {
+      return req.user.id;
+    }
+
+    const authorization = req?.headers?.authorization;
+
+    if (!authorization?.startsWith('Bearer ')) {
+      return undefined;
+    }
+
+    try {
+      const payload = this.jwtService.verify<{ sub: string }>(authorization.slice(7));
+      return payload.sub;
+    } catch {
+      return undefined;
+    }
+  }
 
   @Get()
   @ApiOperation({ summary: '获取动态列表' })
@@ -27,14 +51,14 @@ export class PostsController {
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 20,
     @Query('category') category?: string,
+    @Request() req?: ExpressRequest & { user?: { id: string } },
   ) {
-    return this.postsService.findAll(Number(page) || 1, Number(limit) || 20, category);
-  }
-
-  @Get(':id')
-  @ApiOperation({ summary: '获取动态详情' })
-  findOne(@Param('id') id: string) {
-    return this.postsService.findOne(id);
+    return this.postsService.findAll(
+      Number(page) || 1,
+      Number(limit) || 20,
+      category,
+      this.getViewerId(req),
+    );
   }
 
   @Post()
@@ -103,7 +127,22 @@ export class PostsController {
     @Param('userId') userId: string,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 20,
+    @Request() req?: ExpressRequest & { user?: { id: string } },
   ) {
-    return this.postsService.findByUser(userId, Number(page) || 1, Number(limit) || 20);
+    return this.postsService.findByUser(
+      userId,
+      Number(page) || 1,
+      Number(limit) || 20,
+      this.getViewerId(req),
+    );
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: '获取动态详情' })
+  findOne(
+    @Param('id') id: string,
+    @Request() req?: ExpressRequest & { user?: { id: string } },
+  ) {
+    return this.postsService.findOne(id, this.getViewerId(req));
   }
 }

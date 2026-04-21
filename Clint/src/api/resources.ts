@@ -22,6 +22,7 @@ export interface Resource {
   }
   createdAt: string
   updatedAt: string
+  isCollected?: boolean
 }
 
 // 分页响应

@@ -23,9 +23,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
       if (typeof exceptionResponse === 'string') {
         message = exceptionResponse;
+        error = exception.name;
       } else if (typeof exceptionResponse === 'object') {
         message = (exceptionResponse as any).message || message;
-        error = (exceptionResponse as any).error || error;
+        error = (exceptionResponse as any).error || exception.name;
       }
     } else if (exception instanceof Error) {
       message = exception.message;

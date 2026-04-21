@@ -1,4 +1,6 @@
 import { get, post, put } from '@/utils/request'
+import type { Post } from '@/api/posts'
+import type { Resource } from '@/api/resources'
 
 // 用户信息类型
 export interface User {
@@ -16,11 +18,13 @@ export interface User {
   postsCount: number
   createdAt: string
   updatedAt: string
+  isFollowing?: boolean
 }
 
 // 更新用户信息DTO
 export interface UpdateUserDto {
   nickname?: string
+  avatar?: string
   bio?: string
   school?: string
   college?: string
@@ -37,6 +41,18 @@ export interface PageResponse<T> {
   totalPages: number
 }
 
+export interface MyCollectionsResponse {
+  posts: Post[]
+  resources: Resource[]
+}
+
+export interface FollowActionResponse {
+  following: boolean
+  followersCount: number
+  followingCount: number
+  message: string
+}
+
 // 获取用户列表
 export function getUsers(params: { page?: number; limit?: number }) {
   return get<PageResponse<User>>('/users', params)
@@ -45,6 +61,11 @@ export function getUsers(params: { page?: number; limit?: number }) {
 // 获取当前用户信息
 export function getCurrentUser() {
   return get<User>('/users/me')
+}
+
+// 获取当前用户收藏列表
+export function getMyCollections() {
+  return get<MyCollectionsResponse>('/users/me/collections')
 }
 
 // 获取用户详情
@@ -59,12 +80,12 @@ export function updateUser(data: UpdateUserDto) {
 
 // 关注用户
 export function followUser(id: string) {
-  return post(`/users/${id}/follow`)
+  return post<FollowActionResponse>(`/users/${id}/follow`)
 }
 
 // 取消关注
 export function unfollowUser(id: string) {
-  return post(`/users/${id}/unfollow`)
+  return post<FollowActionResponse>(`/users/${id}/unfollow`)
 }
 
 // 获取粉丝列表

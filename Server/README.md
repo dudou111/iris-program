@@ -79,6 +79,9 @@ cp .env.example .env
 编辑 `.env` 文件，配置数据库和微信小程序信息：
 
 \`\`\`env
+PORT=3000
+HOST=0.0.0.0
+
 # 数据库配置
 DB_HOST=localhost
 DB_PORT=5432
@@ -117,7 +120,7 @@ npm run start:prod
 
 ### 访问 API 文档
 
-启动后访问: http://localhost:3000/api
+启动后访问: <http://localhost:3000/api-docs>（端口可通过 `.env` 中 `PORT` 调整）
 
 ## 数据库设计
 

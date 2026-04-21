@@ -10,124 +10,216 @@
       </view>
     </view>
 
-    <view class="user-card">
-      <view class="user-header">
-        <image :src="user.avatar" class="user-avatar" mode="aspectFill" />
-        <view class="user-info">
-          <view class="user-name">{{ user.username }}</view>
-          <view class="user-id">ID: {{ user.id }}</view>
-        </view>
-      </view>
-      <view class="user-bio">{{ user.bio }}</view>
-      <view class="user-stats">
-        <view class="stat-item">
-          <view class="stat-value">{{ user.posts }}</view>
-          <view class="stat-label">动态</view>
-        </view>
-        <view class="stat-item">
-          <view class="stat-value">{{ user.followers }}</view>
-          <view class="stat-label">粉丝</view>
-        </view>
-        <view class="stat-item">
-          <view class="stat-value">{{ user.following }}</view>
-          <view class="stat-label">关注</view>
-        </view>
-      </view>
-      <view class="user-actions">
-        <view class="btn-follow" :class="{ following: user.isFollowing }" @tap="handleFollow">
-          {{ user.isFollowing ? '已关注' : '关注' }}
-        </view>
-        <view class="btn-message" @tap="handleMessage">
-          💬 发消息
-        </view>
-      </view>
+    <view v-if="loading" class="empty-state">
+      <view class="empty-text">加载中...</view>
     </view>
 
-    <view class="content-tabs">
-      <view
-        v-for="tab in tabs"
-        :key="tab.key"
-        class="content-tab"
-        :class="{ active: currentTab === tab.key }"
-        @tap="currentTab = tab.key"
-      >
-        {{ tab.label }}
-      </view>
-    </view>
-
-    <view v-if="currentTab === 'posts'" class="post-list">
-      <view v-for="post in userPosts" :key="post.id" class="card-post" @tap="handlePostClick(post)">
-        <view class="card-post-content">{{ post.content }}</view>
-        <view v-if="post.images && post.images.length" class="card-post-images" :class="getImageClass(post.images.length)">
-          <image
-            v-for="(image, index) in post.images"
-            :key="index"
-            :src="image"
-            class="card-post-image"
-            mode="aspectFill"
-          />
+    <template v-else>
+      <view class="user-card">
+        <view class="user-header">
+          <image :src="user.avatar" class="user-avatar" mode="aspectFill" />
+          <view class="user-info">
+            <view class="user-name">{{ user.username }}</view>
+          </view>
         </view>
-        <view class="card-post-footer">
-          <text class="post-time">{{ post.time }}</text>
-          <view class="post-stats">
-            <text>❤️ {{ post.likes }}</text>
-            <text>💬 {{ post.comments }}</text>
+        <view class="user-bio">{{ user.bio || '这个人很神秘，什么都没留下。' }}</view>
+        <view class="user-stats">
+          <view class="stat-item">
+            <view class="stat-value">{{ user.posts }}</view>
+            <view class="stat-label">动态</view>
+          </view>
+          <view class="stat-item">
+            <view class="stat-value">{{ user.followers }}</view>
+            <view class="stat-label">粉丝</view>
+          </view>
+          <view class="stat-item">
+            <view class="stat-value">{{ user.following }}</view>
+            <view class="stat-label">关注</view>
+          </view>
+        </view>
+        <view class="user-actions">
+          <view
+            v-if="!isSelfProfile"
+            class="btn-follow"
+            :class="{ following: user.isFollowing }"
+            @tap="handleFollow"
+          >
+            {{ user.isFollowing ? '已关注' : '关注' }}
+          </view>
+          <view class="btn-message" @tap="handleMessage">
+            💬 {{ isSelfProfile ? '我的消息' : '发消息' }}
           </view>
         </view>
       </view>
-    </view>
 
-    <view v-if="currentTab === 'collections'" class="collection-list">
-      <view class="empty-state">
-        <text class="empty-icon">⭐</text>
-        <view class="empty-text">暂无收藏</view>
+      <view class="content-tabs">
+        <view
+          v-for="tab in tabs"
+          :key="tab.key"
+          class="content-tab"
+          :class="{ active: currentTab === tab.key }"
+          @tap="currentTab = tab.key"
+        >
+          {{ tab.label }}
+        </view>
       </view>
-    </view>
+
+      <view v-if="currentTab === 'posts'" class="post-list">
+        <view v-if="userPosts.length === 0" class="empty-state">
+          <view class="empty-text">还没有发布动态</view>
+        </view>
+        <view v-for="post in userPosts" :key="post.id" class="card-post" @tap="handlePostClick(post.id)">
+          <view class="card-post-content">{{ post.content }}</view>
+          <view
+            v-if="post.images.length"
+            class="card-post-images"
+            :class="getImageClass(post.images.length)"
+          >
+            <image
+              v-for="(image, index) in post.images"
+              :key="index"
+              :src="image"
+              class="card-post-image"
+              mode="aspectFill"
+            />
+          </view>
+          <view class="card-post-footer">
+            <text class="post-time">{{ post.time }}</text>
+            <view class="post-stats">
+              <text>❤️ {{ post.likes }}</text>
+              <text>💬 {{ post.comments }}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view v-if="currentTab === 'collections'" class="collection-list">
+        <view class="empty-state">
+          <text class="empty-icon">⭐</text>
+          <view class="empty-text">收藏列表将在下一阶段接入</view>
+        </view>
+      </view>
+    </template>
   </view>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+import { getUserPosts, type Post } from '@/api/posts'
+import { followUser, getCurrentUser, getUserDetail, type User, unfollowUser } from '@/api/users'
+import { createDefaultAvatar, resolveMediaUrl, resolveMediaUrls } from '@/utils/media'
+
+interface ProfileUser {
+  id: string
+  avatar: string
+  username: string
+  bio?: string
+  posts: number
+  followers: number
+  following: number
+  isFollowing: boolean
+}
+
+interface ProfilePost {
+  id: string
+  content: string
+  images: string[]
+  time: string
+  likes: number
+  comments: number
+}
 
 const currentTab = ref('posts')
+const loading = ref(true)
+const currentUserId = ref((uni.getStorageSync('userInfo')?.id || '') as string)
+const routeUserId = ref('')
 
 const tabs = [
   { key: 'posts', label: '动态' },
   { key: 'collections', label: '收藏' }
 ]
 
-const user = ref({
-  id: '123456',
-  avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=User',
-  username: '张同学',
-  bio: '计算机学院 | 热爱编程 | 喜欢分享',
-  posts: 128,
-  followers: 1234,
-  following: 567,
+const user = ref<ProfileUser>({
+  id: '',
+  avatar: createDefaultAvatar('default'),
+  username: '未知用户',
+  bio: '',
+  posts: 0,
+  followers: 0,
+  following: 0,
   isFollowing: false
 })
 
-const userPosts = ref([
-  {
-    id: 1,
-    content: '今天天气真好，图书馆学习一整天！',
-    images: ['https://picsum.photos/300/300?random=1'],
-    time: '2小时前',
-    likes: 45,
-    comments: 12
-  },
-  {
-    id: 2,
-    content: '分享一下最近学习的笔记，希望对大家有帮助～',
-    images: [
-      'https://picsum.photos/300/300?random=2',
-      'https://picsum.photos/300/300?random=3'
-    ],
-    time: '1天前',
-    likes: 89,
-    comments: 23
+const userPosts = ref<ProfilePost[]>([])
+
+const isSelfProfile = computed(() => Boolean(user.value.id) && user.value.id === currentUserId.value)
+
+const getProfileUserId = () => routeUserId.value || currentUserId.value
+
+const formatTime = (dateString: string) => {
+  const date = new Date(dateString)
+  const now = new Date()
+  const diff = now.getTime() - date.getTime()
+  const minutes = Math.floor(diff / 60000)
+  const hours = Math.floor(diff / 3600000)
+  const days = Math.floor(diff / 86400000)
+
+  if (minutes < 1) return '刚刚'
+  if (minutes < 60) return `${minutes}分钟前`
+  if (hours < 24) return `${hours}小时前`
+  if (days < 7) return `${days}天前`
+
+  return date.toLocaleDateString('zh-CN')
+}
+
+const mapUser = (detail: User): ProfileUser => ({
+  id: detail.id,
+  avatar: resolveMediaUrl(detail.avatar) || createDefaultAvatar(detail.nickname || detail.id),
+  username: detail.nickname || '未知用户',
+  bio: detail.bio,
+  posts: detail.postsCount,
+  followers: detail.followersCount,
+  following: detail.followingCount,
+  isFollowing: Boolean(detail.isFollowing)
+})
+
+const mapPost = (post: Post): ProfilePost => ({
+  id: post.id,
+  content: post.content,
+  images: resolveMediaUrls(post.images),
+  time: formatTime(post.createdAt),
+  likes: post.likesCount,
+  comments: post.commentsCount
+})
+
+const loadCurrentUser = async () => {
+  if (currentUserId.value) return
+
+  try {
+    const me = await getCurrentUser()
+    currentUserId.value = me.id
+  } catch (error) {
+    console.error('加载当前用户失败:', error)
   }
-])
+}
+
+const loadProfile = async () => {
+  const userId = getProfileUserId()
+  if (!userId) {
+    uni.showToast({ title: '用户不存在', icon: 'none' })
+    setTimeout(() => uni.navigateBack(), 1500)
+    return
+  }
+
+  const [detail, posts] = await Promise.all([
+    getUserDetail(userId),
+    getUserPosts(userId, { page: 1, limit: 20 })
+  ])
+
+  user.value = mapUser(detail)
+  userPosts.value = posts.data.map(mapPost)
+}
 
 const getImageClass = (count: number) => {
   if (count === 1) return 'single'
@@ -141,36 +233,73 @@ const handleBack = () => {
 
 const handleMore = () => {
   uni.showActionSheet({
-    itemList: ['举报', '拉黑'],
-    success: (res) => {
-      console.log('选择了：', res.tapIndex)
-    }
+    itemList: isSelfProfile.value ? ['分享主页'] : ['举报', '分享主页']
   })
 }
 
-const handleFollow = () => {
-  user.value.isFollowing = !user.value.isFollowing
-  user.value.followers += user.value.isFollowing ? 1 : -1
-  uni.showToast({
-    title: user.value.isFollowing ? '关注成功' : '取消关注',
-    icon: 'success'
-  ,
-      duration: 2000
-    })
+const handleFollow = async () => {
+  if (isSelfProfile.value || !user.value.id) return
+
+  try {
+    if (user.value.isFollowing) {
+      const res = await unfollowUser(user.value.id)
+      user.value.isFollowing = Boolean(res.following)
+      user.value.followers = res.followersCount
+      uni.showToast({ title: '取消关注', icon: 'success' })
+    } else {
+      const res = await followUser(user.value.id)
+      user.value.isFollowing = Boolean(res.following)
+      user.value.followers = res.followersCount
+      uni.showToast({ title: '关注成功', icon: 'success' })
+    }
+  } catch (error) {
+    console.error('关注操作失败:', error)
+  }
 }
 
 const handleMessage = () => {
+  if (!user.value.id) return
+
+  if (isSelfProfile.value) {
+    uni.navigateTo({
+      url: '/pages/message/message',
+      fail: (err) => {
+        console.error('页面跳转失败:', err)
+      }
+    })
+    return
+  }
+
+  const query = `id=${user.value.id}&nickname=${encodeURIComponent(user.value.username)}&avatar=${encodeURIComponent(user.value.avatar)}`
+
   uni.navigateTo({
-    url: '/pages/chat/chat',
+    url: `/pages/chat/chat?${query}`,
     fail: (err) => {
       console.error('页面跳转失败:', err)
     }
   })
 }
 
-const handlePostClick = (post: any) => {
-  uni.navigateTo({ url: `/pages/post-detail/post-detail?id=${post.id}` })
+const handlePostClick = (postId: string) => {
+  uni.navigateTo({ url: `/pages/post-detail/post-detail?id=${postId}` })
 }
+
+onLoad((options) => {
+  routeUserId.value = typeof options?.id === 'string' ? options.id : ''
+})
+
+onMounted(async () => {
+  loading.value = true
+  try {
+    await loadCurrentUser()
+    await loadProfile()
+  } catch (error) {
+    console.error('加载用户主页失败:', error)
+    uni.showToast({ title: '加载失败', icon: 'none' })
+  } finally {
+    loading.value = false
+  }
+})
 </script>
 
 <style scoped>
@@ -241,11 +370,6 @@ const handlePostClick = (post: any) => {
   font-weight: 500;
   color: #333;
   margin-bottom: 8rpx;
-}
-
-.user-id {
-  font-size: 26rpx;
-  color: #999;
 }
 
 .user-bio {

@@ -109,6 +109,12 @@ export class User {
   @JoinTable({ name: 'user_collected_resources' })
   collectedResources: Resource[];
 
+  @ManyToMany(() => Comment)
+  @JoinTable({ name: 'user_liked_comments' })
+  likedComments: Comment[];
+
   @ManyToMany(() => Circle, (circle) => circle.members)
   circles: Circle[];
+
+  isFollowing?: boolean;
 }

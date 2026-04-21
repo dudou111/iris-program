@@ -60,4 +60,6 @@ export class Comment {
 
   @Column({ nullable: true })
   replyToUserId: string;
+
+  isLiked?: boolean;
 }

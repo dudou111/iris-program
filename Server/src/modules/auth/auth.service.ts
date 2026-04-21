@@ -57,6 +57,7 @@ export class AuthService {
 
       return {
         accessToken,
+        access_token: accessToken,
         user,
       };
     } catch (error) {
@@ -97,6 +98,7 @@ export class AuthService {
 
     return {
       accessToken,
+      access_token: accessToken,
       user: userWithoutPassword,
     };
   }
@@ -125,6 +127,7 @@ export class AuthService {
 
     return {
       accessToken,
+      access_token: accessToken,
       user: userWithoutPassword,
     };
   }

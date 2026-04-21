@@ -16,10 +16,14 @@ export interface Post {
   isDeleted: boolean
   createdAt: string
   updatedAt: string
+  isLiked?: boolean
+  isCollected?: boolean
+  isCommented?: boolean
   author: {
     id: string
     nickname: string
     avatar: string
+    isFollowing?: boolean
   }
 }
 

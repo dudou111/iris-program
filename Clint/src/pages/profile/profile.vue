@@ -1,24 +1,24 @@
 <template>
   <view class="profile-page">
     <view class="profile-header">
-      <image src="https://api.dicebear.com/7.x/avataaars/svg?seed=User" class="avatar" mode="aspectFill" />
+      <image :src="profile.avatar" class="avatar" mode="aspectFill" />
       <view class="user-info">
-        <view class="username">用户昵称</view>
-        <view class="user-id">ID: 123456</view>
+        <view class="username">{{ profile.nickname }}</view>
+        <view v-if="profile.bio" class="user-bio">{{ profile.bio }}</view>
       </view>
     </view>
 
     <view class="stats">
       <view class="stat-item" @tap="goToFollowing">
-        <view class="stat-value">128</view>
+        <view class="stat-value">{{ profile.followingCount }}</view>
         <view class="stat-label">关注</view>
       </view>
       <view class="stat-item" @tap="goToFollowers">
-        <view class="stat-value">256</view>
+        <view class="stat-value">{{ profile.followersCount }}</view>
         <view class="stat-label">粉丝</view>
       </view>
       <view class="stat-item" @tap="goToMyPosts">
-        <view class="stat-value">45</view>
+        <view class="stat-value">{{ profile.postsCount }}</view>
         <view class="stat-label">动态</view>
       </view>
     </view>
@@ -52,10 +52,73 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted, onUnmounted, ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import CustomTabBar from '@/components/custom-tab-bar/custom-tab-bar.vue'
 import Icon from '@/components/icon/icon.vue'
+import { getCurrentUser, type User } from '@/api/users'
+import { getToken } from '@/utils/request'
+import { createDefaultAvatar, resolveMediaUrl } from '@/utils/media'
+
+interface ProfileState {
+  id: string
+  nickname: string
+  avatar: string
+  bio: string
+  followersCount: number
+  followingCount: number
+  postsCount: number
+}
+
+const createGuestProfile = (): ProfileState => ({
+  id: '',
+  nickname: '未登录',
+  avatar: createDefaultAvatar('guest'),
+  bio: '',
+  followersCount: 0,
+  followingCount: 0,
+  postsCount: 0
+})
+
+const profile = ref<ProfileState>(createGuestProfile())
+
+const mapProfile = (user: User): ProfileState => ({
+  id: user.id,
+  nickname: user.nickname || '未命名用户',
+  avatar: resolveMediaUrl(user.avatar) || createDefaultAvatar(user.nickname || user.id),
+  bio: user.bio || '',
+  followersCount: user.followersCount || 0,
+  followingCount: user.followingCount || 0,
+  postsCount: user.postsCount || 0
+})
+
+const loadProfile = async () => {
+  if (!getToken()) {
+    profile.value = createGuestProfile()
+    return
+  }
+
+  try {
+    const user = await getCurrentUser()
+    profile.value = mapProfile(user)
+    uni.setStorageSync('userInfo', user)
+  } catch (error) {
+    console.error('加载我的信息失败:', error)
+  }
+}
+
+const requireLogin = () => {
+  if (profile.value.id) {
+    return true
+  }
+
+  uni.navigateTo({ url: '/pages/login/login' })
+  return false
+}
 
 const goToFollowing = () => {
+  if (!requireLogin()) return
+
   uni.navigateTo({
     url: '/pages/following/following',
     fail: (err) => {
@@ -65,6 +128,8 @@ const goToFollowing = () => {
 }
 
 const goToFollowers = () => {
+  if (!requireLogin()) return
+
   uni.navigateTo({
     url: '/pages/followers/followers',
     fail: (err) => {
@@ -74,6 +139,8 @@ const goToFollowers = () => {
 }
 
 const goToMyPosts = () => {
+  if (!requireLogin()) return
+
   uni.navigateTo({
     url: '/pages/my-posts/my-posts',
     fail: (err) => {
@@ -83,6 +150,8 @@ const goToMyPosts = () => {
 }
 
 const goToMyCollections = () => {
+  if (!requireLogin()) return
+
   uni.navigateTo({
     url: '/pages/my-collections/my-collections',
     fail: (err) => {
@@ -92,6 +161,8 @@ const goToMyCollections = () => {
 }
 
 const goToEditProfile = () => {
+  if (!requireLogin()) return
+
   uni.navigateTo({
     url: '/pages/edit-profile/edit-profile',
     fail: (err) => {
@@ -108,6 +179,19 @@ const goToSettings = () => {
     }
   })
 }
+
+const handleUserUpdated = () => {
+  loadProfile()
+}
+
+onMounted(() => {
+  loadProfile()
+  uni.$on('user:updated', handleUserUpdated)
+})
+onShow(loadProfile)
+onUnmounted(() => {
+  uni.$off('user:updated', handleUserUpdated)
+})
 </script>
 
 <style scoped>
@@ -145,9 +229,10 @@ const goToSettings = () => {
   margin-bottom: 8rpx;
 }
 
-.user-id {
-  font-size: 28rpx;
-  color: #999;
+.user-bio {
+  margin-top: 8rpx;
+  font-size: 26rpx;
+  color: #666;
 }
 
 .stats {

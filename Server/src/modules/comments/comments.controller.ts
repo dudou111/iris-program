@@ -10,16 +10,40 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import type { Request as ExpressRequest } from 'express';
 
 @ApiTags('评论管理')
 @Controller('comments')
 export class CommentsController {
-  constructor(private readonly commentsService: CommentsService) {}
+  constructor(
+    private readonly commentsService: CommentsService,
+    private readonly jwtService: JwtService,
+  ) {}
+
+  private getViewerId(req?: ExpressRequest & { user?: { id: string } }) {
+    if (req?.user?.id) {
+      return req.user.id;
+    }
+
+    const authorization = req?.headers?.authorization;
+
+    if (!authorization?.startsWith('Bearer ')) {
+      return undefined;
+    }
+
+    try {
+      const payload = this.jwtService.verify<{ sub: string }>(authorization.slice(7));
+      return payload.sub;
+    } catch {
+      return undefined;
+    }
+  }
 
   @Get('post/:postId')
   @ApiOperation({ summary: '获取动态评论列表' })
@@ -27,14 +51,23 @@ export class CommentsController {
     @Param('postId') postId: string,
     @Query('page') page: number,
     @Query('limit') limit: number,
+    @Request() req?: ExpressRequest & { user?: { id: string } },
   ) {
-    return this.commentsService.findByPost(postId, page, limit);
+    return this.commentsService.findByPost(
+      postId,
+      Number(page) || 1,
+      Number(limit) || 20,
+      this.getViewerId(req),
+    );
   }
 
   @Get(':id')
   @ApiOperation({ summary: '获取评论详情' })
-  findOne(@Param('id') id: string) {
-    return this.commentsService.findOne(id);
+  findOne(
+    @Param('id') id: string,
+    @Request() req?: ExpressRequest & { user?: { id: string } },
+  ) {
+    return this.commentsService.findOne(id, this.getViewerId(req));
   }
 
   @Post()

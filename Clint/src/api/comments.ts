@@ -21,6 +21,7 @@ export interface Comment {
   }
   createdAt: string
   updatedAt: string
+  isLiked?: boolean
 }
 
 // 分页响应

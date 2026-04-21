@@ -6,3 +6,13 @@ declare module '*.vue' {
   const component: DefineComponent<{}, {}, any>
   export default component
 }
+
+declare module 'uview-plus' {
+  import type { App } from 'vue'
+
+  const uviewPlus: {
+    install: (app: App) => void
+  }
+
+  export default uviewPlus
+}

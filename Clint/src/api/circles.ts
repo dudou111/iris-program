@@ -12,8 +12,8 @@ export interface Circle {
   tags: string[]
   membersCount: number
   postsCount: number
-  ownerId: string
-  owner: {
+  creatorId: string
+  creator: {
     id: string
     nickname: string
     avatar: string

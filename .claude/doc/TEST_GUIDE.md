@@ -80,48 +80,49 @@ npm run dev:mp-weixin
 - [ ] 验证token保存成功
 - [ ] 测试登录失败情况（错误密码）
 
-#### 首页
-- [ ] 查看帖子列表
-- [ ] 切换话题分类（全部/学习/生活/活动/表白墙）
-- [ ] 下拉刷新
-- [ ] 上拉加载更多
-- [ ] 点赞/取消点赞
-- [ ] 收藏/取消收藏
-- [ ] 查看评论
-- [ ] 点击帖子查看详情
+#### 首页与动态状态同步
+- [ ] 首页真实加载帖子列表
+- [ ] 切换话题分类（全部/学习/生活/活动/表白墙）后结果随服务端变化
+- [ ] 下拉刷新与上拉加载更多正常
+- [ ] 点赞/取消点赞后计数立即更新
+- [ ] 收藏/取消收藏后计数立即更新
+- [ ] 从首页进入详情页后，点赞/收藏状态与列表保持一致
+- [ ] 发布带图动态后返回首页可见新内容
 
-#### 圈子
-- [ ] 查看圈子列表
-- [ ] 点击圈子查看详情
-- [ ] 加入/退出圈子
-- [ ] 在圈子内发帖
+#### 搜索
+- [ ] 输入关键词后触发真实搜索
+- [ ] 综合搜索可同时看到动态、用户、资源结果
+- [ ] 切换“动态 / 用户 / 资源”tab 后列表变化正确
+- [ ] 点击用户结果跳转用户主页
+- [ ] 点击动态结果跳转详情页
 
-#### 活动
-- [ ] 查看活动列表
-- [ ] 筛选活动（即将开始/进行中/已结束）
-- [ ] 点击活动查看详情
-- [ ] 报名/取消报名活动
+#### 动态详情与评论
+- [ ] 详情页真实加载帖子内容、点赞数、评论数、收藏数
+- [ ] 详情页可加载评论列表
+- [ ] 发表评论后评论列表刷新，帖子评论数同步增加
+- [ ] 回复评论后评论列表刷新
+- [ ] 点赞/取消点赞评论后单条评论状态更新
+- [ ] 详情页关注按钮与用户主页关注按钮状态一致
 
-#### 资源
-- [ ] 查看资源列表
-- [ ] 筛选资源类型（二手/学习/失物/招领）
-- [ ] 点击资源查看详情
-- [ ] 收藏资源
-- [ ] 联系发布者
+#### 用户主页
+- [ ] 通过搜索结果或详情页进入用户主页
+- [ ] 用户资料、粉丝数、关注数、动态列表真实加载
+- [ ] 关注/取消关注后粉丝数与按钮状态立即更新
+- [ ] 用户主页动态列表进入详情后状态一致
 
-#### 个人中心
-- [ ] 查看个人信息
-- [ ] 编辑个人资料
-- [ ] 查看我的发布
-- [ ] 查看我的收藏
-- [ ] 查看关注/粉丝列表
-- [ ] 退出登录
+#### 发布与图片上传
+- [ ] 发布动态时选择本地图片
+- [ ] 发布请求前先完成图片上传
+- [ ] 发布成功后详情页与首页都能访问上传后的图片 URL
 
-#### 发布功能
-- [ ] 发布动态（文字+图片）
-- [ ] 发布资源
-- [ ] 创建活动
-- [ ] 创建圈子
+#### 聊天 REST 与 WebSocket
+- [ ] 从用户主页进入聊天页
+- [ ] 聊天页真实加载历史消息
+- [ ] 发送文本消息后消息立即出现在当前会话
+- [ ] 进入会话后当前会话被标记已读
+- [ ] 使用两个账号分别打开聊天页，A 发送消息后 B 在线实时收到 `message:new`
+- [ ] B 收到消息后自动滚动到底部
+- [ ] 关闭聊天页后再次进入，历史消息仍可通过 REST 拉取
 
 ### 4. 兼容性测试
 
@@ -135,6 +136,32 @@ npm run dev:mp-weixin
 - [ ] 微信开发者工具
 - [ ] 真机调试
 - [ ] 不同机型适配
+
+## 自动化验证
+
+### 后端已验证命令
+
+```bash
+cd Server
+npm test -- src/modules/posts/posts.service.spec.ts --runInBand
+npm test -- src/modules/messages/messages.service.spec.ts --runInBand
+npm run build
+```
+
+说明：
+- Jest 在当前环境建议统一追加 `--runInBand`，否则可能出现 `spawn EPERM`
+- 本轮新增消息实时层依赖 `ws`
+
+### 前端已验证命令
+
+```bash
+cd Clint
+npm run type-check
+```
+
+说明：
+- 当前 `type-check` 仍会失败，但失败来源是既有 wrapper 页面语法问题，不是本轮新增页面
+- 目前已确认仍报错的文件包括：`ActivitiesPage.vue`、`CirclesPage.vue`、`HomePage.vue`、`ProfilePage.vue`、`PublishPage.vue` 等
 
 ## API测试
 
@@ -154,12 +181,47 @@ http://localhost:3000/api-docs
 - PUT /posts/:id - 更新帖子
 - DELETE /posts/:id - 删除帖子
 - POST /posts/:id/like - 点赞
-- DELETE /posts/:id/like - 取消点赞
+- POST /posts/:id/unlike - 取消点赞
+- POST /posts/:id/collect - 收藏
+- POST /posts/:id/uncollect - 取消收藏
+- GET /posts/user/:userId - 获取用户动态列表
 
 #### 资源
 - GET /resources - 获取资源列表
 - GET /resources/:id - 获取资源详情
 - POST /resources - 创建资源
+- POST /resources/:id/collect - 收藏资源
+- POST /resources/:id/uncollect - 取消收藏资源
+
+#### 评论
+- GET /comments/post/:postId - 获取帖子评论
+- POST /comments - 创建评论
+- POST /comments/:id/like - 点赞评论
+- POST /comments/:id/unlike - 取消点赞评论
+
+#### 用户
+- GET /users/:id - 获取用户详情
+- POST /users/:id/follow - 关注用户
+- POST /users/:id/unfollow - 取消关注
+- GET /users/:id/followers - 获取粉丝列表
+- GET /users/:id/following - 获取关注列表
+
+#### 搜索
+- GET /search?q=关键词&type=all - 综合搜索
+- GET /search?q=关键词&type=posts - 动态搜索
+- GET /search?q=关键词&type=users - 用户搜索
+- GET /search?q=关键词&type=resources - 资源搜索
+
+#### 上传
+- POST /upload/images - 上传图片
+
+#### 消息
+- GET /messages/conversations - 获取会话列表
+- GET /messages/conversation/:userId - 获取聊天记录
+- POST /messages - 发送消息
+- PUT /messages/conversation/:userId/read - 标记会话已读
+- GET /messages/unread/count - 获取未读数
+- WS /messages/ws?token=<jwt> - 实时消息连接
 
 #### 活动
 - GET /activities - 获取活动列表
@@ -194,11 +256,8 @@ http://localhost:3000/api-docs
 - 需要配置服务器域名白名单
 - 或使用开发版/体验版进行测试
 
-## 下一步优化
+## 已知问题
 
-1. 添加图片上传功能
-2. 实现实时消息推送
-3. 添加搜索功能
-4. 完善评论功能
-5. 添加用户关注功能
-6. 实现点赞和收藏的状态同步
+1. 前端 `npm run type-check` 仍被旧的 wrapper 页面语法错误阻塞，尚未在本轮一并清理。
+2. 聊天实时连接当前仅在聊天页建立，符合本轮设计范围，尚未扩展到全局消息页或通知页。
+3. 收藏列表页仍是占位内容，真实收藏聚合不在本轮范围内。

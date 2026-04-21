@@ -9,15 +9,39 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import type { Request as ExpressRequest } from 'express';
 
 @ApiTags('用户管理')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+  ) {}
+
+  private getViewerId(req?: ExpressRequest & { user?: { id: string } }) {
+    if (req?.user?.id) {
+      return req.user.id;
+    }
+
+    const authorization = req?.headers?.authorization;
+
+    if (!authorization?.startsWith('Bearer ')) {
+      return undefined;
+    }
+
+    try {
+      const payload = this.jwtService.verify<{ sub: string }>(authorization.slice(7));
+      return payload.sub;
+    } catch {
+      return undefined;
+    }
+  }
 
   @Get()
   @ApiOperation({ summary: '获取用户列表' })
@@ -30,13 +54,24 @@ export class UsersController {
   @ApiBearerAuth()
   @ApiOperation({ summary: '获取当前用户信息' })
   getProfile(@Request() req) {
-    return this.usersService.findOne(req.user.id);
+    return this.usersService.findOne(req.user.id, req.user.id);
+  }
+
+  @Get('me/collections')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '获取当前用户收藏列表' })
+  getMyCollections(@Request() req) {
+    return this.usersService.getCollections(req.user.id);
   }
 
   @Get(':id')
   @ApiOperation({ summary: '获取用户详情' })
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
+  findOne(
+    @Param('id') id: string,
+    @Request() req?: ExpressRequest & { user?: { id: string } },
+  ) {
+    return this.usersService.findOne(id, this.getViewerId(req));
   }
 
   @Put('me')
@@ -69,8 +104,9 @@ export class UsersController {
     @Param('id') id: string,
     @Query('page') page: number,
     @Query('limit') limit: number,
+    @Request() req?: ExpressRequest & { user?: { id: string } },
   ) {
-    return this.usersService.getFollowers(id, page, limit);
+    return this.usersService.getFollowers(id, page, limit, this.getViewerId(req));
   }
 
   @Get(':id/following')
@@ -79,7 +115,8 @@ export class UsersController {
     @Param('id') id: string,
     @Query('page') page: number,
     @Query('limit') limit: number,
+    @Request() req?: ExpressRequest & { user?: { id: string } },
   ) {
-    return this.usersService.getFollowing(id, page, limit);
+    return this.usersService.getFollowing(id, page, limit, this.getViewerId(req));
   }
 }

@@ -37,18 +37,29 @@
 </template>
 
 <script setup lang="ts">
+import { clearToken } from '@/utils/request'
+
 const handleLogout = () => {
   uni.showModal({
     title: '提示',
     content: '确定要退出登录吗？',
-    success: (res) => {
+    success: async (res) => {
       if (res.confirm) {
+        clearToken()
+        uni.removeStorageSync('userInfo')
+        uni.$emit('user:updated')
+
         uni.showToast({
           title: '已退出',
-          icon: 'success'
-        ,
-      duration: 2000
-    })
+          icon: 'success',
+          duration: 1200
+        })
+
+        setTimeout(() => {
+          uni.reLaunch({
+            url: '/pages/login/login'
+          })
+        }, 300)
       }
     }
   })

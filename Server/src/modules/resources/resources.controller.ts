@@ -10,16 +10,40 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { ResourcesService } from './resources.service';
 import { CreateResourceDto } from './dto/create-resource.dto';
 import { UpdateResourceDto } from './dto/update-resource.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import type { Request as ExpressRequest } from 'express';
 
 @ApiTags('资源管理')
 @Controller('resources')
 export class ResourcesController {
-  constructor(private readonly resourcesService: ResourcesService) {}
+  constructor(
+    private readonly resourcesService: ResourcesService,
+    private readonly jwtService: JwtService,
+  ) {}
+
+  private getViewerId(req?: ExpressRequest & { user?: { id: string } }) {
+    if (req?.user?.id) {
+      return req.user.id;
+    }
+
+    const authorization = req?.headers?.authorization;
+
+    if (!authorization?.startsWith('Bearer ')) {
+      return undefined;
+    }
+
+    try {
+      const payload = this.jwtService.verify<{ sub: string }>(authorization.slice(7));
+      return payload.sub;
+    } catch {
+      return undefined;
+    }
+  }
 
   @Get()
   @ApiOperation({ summary: '获取资源列表' })
@@ -27,14 +51,9 @@ export class ResourcesController {
     @Query('page') page: number,
     @Query('limit') limit: number,
     @Query('category') category?: string,
+    @Request() req?: ExpressRequest & { user?: { id: string } },
   ) {
-    return this.resourcesService.findAll(page, limit, category);
-  }
-
-  @Get(':id')
-  @ApiOperation({ summary: '获取资源详情' })
-  findOne(@Param('id') id: string) {
-    return this.resourcesService.findOne(id);
+    return this.resourcesService.findAll(page, limit, category, this.getViewerId(req));
   }
 
   @Post()
@@ -89,5 +108,14 @@ export class ResourcesController {
     @Query('limit') limit: number,
   ) {
     return this.resourcesService.findByUser(userId, page, limit);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: '获取资源详情' })
+  findOne(
+    @Param('id') id: string,
+    @Request() req?: ExpressRequest & { user?: { id: string } },
+  ) {
+    return this.resourcesService.findOne(id, this.getViewerId(req));
   }
 }

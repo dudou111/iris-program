@@ -83,6 +83,8 @@
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
+import { register } from '@/api/auth'
+import { setToken } from '@/utils/request'
 
 const formData = reactive({
   username: '',
@@ -172,15 +174,20 @@ const handleRegister = async () => {
   loading.value = true
 
   try {
-    // 模拟注册请求（开发阶段）
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
-    // 保存登录信息到本地存储
-    uni.setStorageSync('token', 'mock-token-' + Date.now())
-    uni.setStorageSync('userInfo', {
-      username: formData.username,
-      nickname: formData.username
+    const res = await register({
+      username: formData.username.trim(),
+      password: formData.password,
+      nickname: formData.username.trim()
     })
+
+    const token = res.accessToken || res.access_token
+
+    if (!token) {
+      throw new Error('注册响应缺少 token')
+    }
+
+    setToken(token)
+    uni.setStorageSync('userInfo', res.user)
 
     uni.showToast({
       title: '注册成功',

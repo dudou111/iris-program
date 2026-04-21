@@ -47,10 +47,20 @@
       <view v-for="post in posts" :key="post.id" class="card-post">
         <!-- 用户信息 -->
         <view class="card-post-header">
-          <image :src="post.avatar" class="card-post-avatar" mode="aspectFill" />
-          <view class="card-post-user">
-            <view class="card-post-username">{{ post.username }}</view>
-            <view class="card-post-time">{{ post.time }}</view>
+          <view class="card-post-author" @tap="handleUserClick(post.authorId)">
+            <image :src="post.avatar" class="card-post-avatar" mode="aspectFill" />
+            <view class="card-post-user">
+              <view class="card-post-username">{{ post.username }}</view>
+              <view class="card-post-time">{{ post.time }}</view>
+            </view>
+          </view>
+          <view
+            v-if="canFollowAuthor(post)"
+            class="card-post-follow"
+            :class="{ following: post.isFollowing }"
+            @tap.stop="handleFollow(post)"
+          >
+            {{ post.isFollowing ? '已关注' : '关注' }}
           </view>
         </view>
 
@@ -73,16 +83,28 @@
 
         <!-- 互动栏 -->
         <view class="card-post-actions">
-          <view class="card-post-action" :class="{ active: post.isLiked }" @tap="handleLike(post)">
-            <Icon :name="post.isLiked ? 'heart' : 'heart'" :size="18" :color="post.isLiked ? '#ff4d4f' : '#666'" />
+          <view
+            class="card-post-action like-action"
+            :class="{ active: post.isLiked }"
+            @tap="handleLike(post)"
+          >
+            <Icon :name="post.isLiked ? 'heart-filled' : 'heart'" :size="18" />
             <text>{{ post.likes }}</text>
           </view>
-          <view class="card-post-action" @tap="handleComment(post)">
-            <Icon name="message" :size="18" color="#666" />
+          <view
+            class="card-post-action comment-action"
+            :class="{ active: post.isCommented }"
+            @tap="handleComment(post)"
+          >
+            <Icon :name="post.isCommented ? 'message-filled' : 'message'" :size="18" />
             <text>{{ post.comments }}</text>
           </view>
-          <view class="card-post-action" @tap="handleCollect(post)">
-            <Icon name="star" :size="18" color="#666" />
+          <view
+            class="card-post-action collect-action"
+            :class="{ active: post.isCollected }"
+            @tap="handleCollect(post)"
+          >
+            <Icon :name="post.isCollected ? 'star-filled' : 'star'" :size="18" />
             <text>{{ post.collects }}</text>
           </view>
         </view>
@@ -100,11 +122,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import CustomTabBar from '@/components/custom-tab-bar/custom-tab-bar.vue'
 import Icon from '@/components/icon/icon.vue'
 import { getPosts, likePost, unlikePost, collectPost, uncollectPost, type Post } from '@/api/posts'
-import { getUnreadCount } from '@/api/messages'
+import { getNotificationUnreadCount } from '@/api/notifications'
+import { followUser, unfollowUser } from '@/api/users'
+import { createDefaultAvatar, resolveMediaUrl, resolveMediaUrls } from '@/utils/media'
+import { getToken } from '@/utils/request'
 
 // 未读消息标识
 const hasUnread = ref(false)
@@ -120,12 +146,111 @@ const topics = ref([
 
 const currentTopic = ref('all')
 
+const requireLogin = () => {
+  if (getToken()) {
+    return true
+  }
+
+  uni.showToast({
+    title: '请先登录',
+    icon: 'none'
+  })
+  setTimeout(() => {
+    uni.navigateTo({ url: '/pages/login/login' })
+  }, 600)
+  return false
+}
+
+interface HomePostItem {
+  id: string
+  authorId: string
+  avatar: string
+  username: string
+  time: string
+  content: string
+  category: string
+  images: string[]
+  likes: number
+  comments: number
+  collects: number
+  isLiked: boolean
+  isCollected: boolean
+  isCommented: boolean
+  isFollowing: boolean
+}
+
+interface PostUpdatePayload {
+  id: string
+  likes?: number
+  comments?: number
+  collects?: number
+  isLiked?: boolean
+  isCollected?: boolean
+  isCommented?: boolean
+}
+
 // 动态列表数据
-const posts = ref<any[]>([])
+const posts = ref<HomePostItem[]>([])
 const loading = ref(false)
 const page = ref(1)
 const limit = ref(20)
 const hasMore = ref(true)
+
+const mapPost = (post: Post): HomePostItem => ({
+  id: post.id,
+  authorId: post.author.id,
+  avatar: resolveMediaUrl(post.author.avatar) || createDefaultAvatar(post.author.nickname || post.id),
+  username: post.author.nickname || '未知用户',
+  time: formatTime(post.createdAt),
+  content: post.content,
+  category: post.category,
+  images: resolveMediaUrls(post.images),
+  likes: post.likesCount,
+  comments: post.commentsCount,
+  collects: post.collectionsCount,
+  isLiked: Boolean(post.isLiked),
+  isCollected: Boolean(post.isCollected),
+  isCommented: Boolean(post.isCommented),
+  isFollowing: Boolean(post.author.isFollowing)
+})
+
+const syncPostItem = (payload: PostUpdatePayload) => {
+  const target = posts.value.find((item) => item.id === payload.id)
+  if (!target) {
+    return
+  }
+
+  if (payload.likes !== undefined) {
+    target.likes = payload.likes
+  }
+  if (payload.comments !== undefined) {
+    target.comments = payload.comments
+  }
+  if (payload.collects !== undefined) {
+    target.collects = payload.collects
+  }
+  if (payload.isLiked !== undefined) {
+    target.isLiked = payload.isLiked
+  }
+  if (payload.isCollected !== undefined) {
+    target.isCollected = payload.isCollected
+  }
+  if (payload.isCommented !== undefined) {
+    target.isCommented = payload.isCommented
+  }
+}
+
+const getCurrentUserId = () => (uni.getStorageSync('userInfo')?.id || '') as string
+
+const canFollowAuthor = (post: HomePostItem) => Boolean(post.authorId) && post.authorId !== getCurrentUserId()
+
+const syncAuthorFollowState = (authorId: string, isFollowing: boolean) => {
+  posts.value.forEach((item) => {
+    if (item.authorId === authorId) {
+      item.isFollowing = isFollowing
+    }
+  })
+}
 
 // 加载动态列表
 const loadPosts = async (refresh = false) => {
@@ -155,20 +280,7 @@ const loadPosts = async (refresh = false) => {
     }
 
     // 转换数据格式
-    const newPosts = res.data.map((post: Post) => ({
-      id: post.id,
-      avatar: post.author.avatar,
-      username: post.author.nickname,
-      time: formatTime(post.createdAt),
-      content: post.content,
-      category: post.category,
-      images: post.images || [],
-      likes: post.likesCount,
-      comments: post.commentsCount,
-      collects: post.collectionsCount,
-      isLiked: false, // TODO: 需要后端返回当前用户是否点赞
-      isCollected: false // TODO: 需要后端返回当前用户是否收藏
-    }))
+    const newPosts = res.data.map(mapPost)
 
     if (refresh) {
       posts.value = newPosts
@@ -206,14 +318,12 @@ const formatTime = (dateString: string) => {
 // 加载未读消息数
 const loadUnreadCount = async () => {
   try {
-    // 检查是否已登录
-    const token = uni.getStorageSync('token')
-    if (!token) {
+    if (!getToken()) {
       hasUnread.value = false
       return
     }
 
-    const res = await getUnreadCount()
+    const res = await getNotificationUnreadCount()
     hasUnread.value = res.count > 0
   } catch (error) {
     console.error('加载未读消息数失败:', error)
@@ -255,53 +365,100 @@ const handleNotification = () => {
 }
 
 // 点赞
-const handleLike = async (post: any) => {
+const handleLike = async (post: HomePostItem) => {
+  if (!requireLogin()) return
+
   try {
     if (post.isLiked) {
-      await unlikePost(post.id)
-      post.isLiked = false
-      post.likes--
+      const res = await unlikePost(post.id)
+      post.isLiked = Boolean(res.liked)
+      post.likes = res.likesCount
     } else {
-      await likePost(post.id)
-      post.isLiked = true
-      post.likes++
+      const res = await likePost(post.id)
+      post.isLiked = Boolean(res.liked)
+      post.likes = res.likesCount
     }
+
+    uni.$emit('post:updated', {
+      id: post.id,
+      likes: post.likes,
+      isLiked: post.isLiked
+    } satisfies PostUpdatePayload)
   } catch (error) {
     console.error('点赞操作失败:', error)
   }
 }
 
 // 评论
-const handleComment = (post: any) => {
+const handleComment = (post: HomePostItem) => {
   uni.navigateTo({
     url: `/pages/post-detail/post-detail?id=${post.id}`
   })
 }
 
+const handleUserClick = (authorId: string) => {
+  if (!authorId) return
+
+  uni.navigateTo({
+    url: `/pages/user-profile/user-profile?id=${authorId}`,
+    fail: (err) => {
+      console.error('页面跳转失败:', err)
+    }
+  })
+}
+
+const handleFollow = async (post: HomePostItem) => {
+  if (!canFollowAuthor(post) || !requireLogin()) return
+
+  try {
+    if (post.isFollowing) {
+      const res = await unfollowUser(post.authorId)
+      syncAuthorFollowState(post.authorId, Boolean(res.following))
+      uni.showToast({
+        title: '已取消关注',
+        icon: 'success'
+      })
+    } else {
+      const res = await followUser(post.authorId)
+      syncAuthorFollowState(post.authorId, Boolean(res.following))
+      uni.showToast({
+        title: '关注成功',
+        icon: 'success'
+      })
+    }
+  } catch (error) {
+    console.error('关注操作失败:', error)
+  }
+}
+
 // 收藏
-const handleCollect = async (post: any) => {
+const handleCollect = async (post: HomePostItem) => {
+  if (!requireLogin()) return
+
   try {
     if (post.isCollected) {
-      await uncollectPost(post.id)
-      post.isCollected = false
-      post.collects--
+      const res = await uncollectPost(post.id)
+      post.isCollected = Boolean(res.collected)
+      post.collects = res.collectionsCount
       uni.showToast({
         title: '取消收藏',
         icon: 'success'
-      ,
-      duration: 2000
-    })
+      })
     } else {
-      await collectPost(post.id)
-      post.isCollected = true
-      post.collects++
+      const res = await collectPost(post.id)
+      post.isCollected = Boolean(res.collected)
+      post.collects = res.collectionsCount
       uni.showToast({
         title: '收藏成功',
         icon: 'success'
-      ,
-      duration: 2000
-    })
+      })
     }
+
+    uni.$emit('post:updated', {
+      id: post.id,
+      collects: post.collects,
+      isCollected: post.isCollected
+    } satisfies PostUpdatePayload)
   } catch (error) {
     console.error('收藏操作失败:', error)
   }
@@ -325,6 +482,8 @@ const handleImagePreview = (images: string[], index: number) => {
 
 // 发布动态
 const handlePublish = () => {
+  if (!requireLogin()) return
+
   uni.navigateTo({
     url: '/pages/publish/publish',
     fail: (err) => {
@@ -346,10 +505,34 @@ const onLoadMore = () => {
   }
 }
 
-// 页面加载时获取数据
-onMounted(() => {
+const refreshHome = () => {
   loadPosts(true)
   loadUnreadCount()
+}
+
+const refreshUnreadState = () => {
+  loadUnreadCount()
+}
+
+const handlePostUpdated = (payload: PostUpdatePayload) => {
+  syncPostItem(payload)
+}
+
+// 页面加载时获取数据
+onMounted(() => {
+  uni.$on('post:published', refreshHome)
+  uni.$on('post:updated', handlePostUpdated)
+  uni.$on('notifications:updated', refreshUnreadState)
+})
+
+onShow(() => {
+  refreshHome()
+})
+
+onUnmounted(() => {
+  uni.$off('post:published', refreshHome)
+  uni.$off('post:updated', handlePostUpdated)
+  uni.$off('notifications:updated', refreshUnreadState)
 })
 </script>
 
@@ -484,7 +667,16 @@ onMounted(() => {
 .card-post-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   margin-bottom: 24rpx;
+  gap: 24rpx;
+}
+
+.card-post-author {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
 }
 
 .card-post-avatar {
@@ -513,6 +705,26 @@ onMounted(() => {
   font-size: 24rpx;
   color: #999;
   margin-top: 4rpx;
+}
+
+.card-post-follow {
+  height: 56rpx;
+  min-width: 120rpx;
+  padding: 0 24rpx;
+  border-radius: 999rpx;
+  background: #1890ff;
+  color: #ffffff;
+  font-size: 24rpx;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.card-post-follow.following {
+  background: #f3f5f7;
+  color: #5f6b7a;
 }
 
 .card-post-content {
@@ -578,7 +790,19 @@ onMounted(() => {
 }
 
 .card-post-action.active {
+  font-weight: 500;
+}
+
+.like-action.active {
   color: #ff4d4f;
+}
+
+.comment-action.active {
+  color: #1890ff;
+}
+
+.collect-action.active {
+  color: #faad14;
 }
 
 .fab {

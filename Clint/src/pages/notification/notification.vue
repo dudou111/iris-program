@@ -10,7 +10,7 @@
       </view>
     </view>
 
-    <scroll-view class="notification-list" scroll-y>
+    <scroll-view class="notification-list" scroll-y @scrolltolower="handleLoadMore">
       <view
         v-for="notification in notifications"
         :key="notification.id"
@@ -18,11 +18,11 @@
         :class="{ unread: !notification.isRead }"
         @tap="handleNotificationClick(notification)"
       >
-        <view class="notification-icon" :class="notification.type">
-          <text v-if="notification.type === 'like'">❤️</text>
-          <text v-if="notification.type === 'comment'">💬</text>
-          <text v-if="notification.type === 'follow'">👤</text>
-          <text v-if="notification.type === 'system'">🔔</text>
+        <view class="notification-avatar-wrap">
+          <image :src="notification.avatar" class="notification-avatar" mode="aspectFill" />
+          <view class="notification-icon" :class="notification.type">
+            <text>{{ notification.icon }}</text>
+          </view>
         </view>
         <view class="notification-content">
           <view class="notification-text">
@@ -31,8 +31,20 @@
           </view>
           <view class="notification-time">{{ notification.time }}</view>
         </view>
-        <image v-if="notification.thumbnail" :src="notification.thumbnail" class="notification-thumbnail" mode="aspectFill" />
+        <image
+          v-if="notification.thumbnail"
+          :src="notification.thumbnail"
+          class="notification-thumbnail"
+          mode="aspectFill"
+        />
         <view v-if="!notification.isRead" class="unread-dot"></view>
+      </view>
+
+      <view v-if="loading" class="status-text">加载中...</view>
+      <view v-else-if="!hasMore && notifications.length > 0" class="status-text">没有更多通知了</view>
+      <view v-else-if="notifications.length === 0" class="empty-state">
+        <view class="empty-title">暂无通知</view>
+        <view class="empty-desc">有人点赞、评论或关注你后，会在这里出现。</view>
       </view>
     </scroll-view>
   </view>
@@ -40,83 +52,201 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
+import {
+  getNotifications,
+  markAllNotificationsRead,
+  markNotificationRead,
+  type NotificationType,
+  type SocialNotification
+} from '@/api/notifications'
+import { createDefaultAvatar, resolveMediaUrl, resolveMediaUrls } from '@/utils/media'
 
-const notifications = ref([
-  {
-    id: 1,
-    type: 'like',
-    username: '张同学',
-    action: '赞了你的动态',
-    time: '5分钟前',
-    thumbnail: 'https://picsum.photos/60/60?random=1',
-    isRead: false,
-    targetId: 1
-  },
-  {
-    id: 2,
-    type: 'comment',
-    username: '李同学',
-    action: '评论了你的动态：很棒的分享！',
-    time: '1小时前',
-    thumbnail: 'https://picsum.photos/60/60?random=2',
-    isRead: false,
-    targetId: 1
-  },
-  {
-    id: 3,
-    type: 'follow',
-    username: '王同学',
-    action: '关注了你',
-    time: '2小时前',
-    thumbnail: null,
-    isRead: true,
-    targetId: 3
-  },
-  {
-    id: 4,
-    type: 'system',
-    username: '系统通知',
-    action: '你的动态获得了100个赞',
-    time: '1天前',
-    thumbnail: null,
-    isRead: true,
-    targetId: null
+interface NotificationItem {
+  id: string
+  type: NotificationType
+  icon: string
+  username: string
+  avatar: string
+  action: string
+  time: string
+  thumbnail: string
+  isRead: boolean
+  postId: string
+  actorId: string
+}
+
+const notifications = ref<NotificationItem[]>([])
+const loading = ref(false)
+const page = ref(1)
+const limit = ref(20)
+const hasMore = ref(true)
+
+const formatTime = (dateString: string) => {
+  const date = new Date(dateString)
+  const now = new Date()
+  const diff = now.getTime() - date.getTime()
+  const minutes = Math.floor(diff / 60000)
+  const hours = Math.floor(diff / 3600000)
+  const days = Math.floor(diff / 86400000)
+
+  if (minutes < 1) return '刚刚'
+  if (minutes < 60) return `${minutes}分钟前`
+  if (hours < 24) return `${hours}小时前`
+  if (days < 7) return `${days}天前`
+
+  return date.toLocaleDateString('zh-CN')
+}
+
+const buildActionText = (notification: SocialNotification) => {
+  if (notification.type === 'like') {
+    return '赞了你的动态'
   }
-])
+
+  if (notification.type === 'comment') {
+    const content = notification.comment?.content?.trim()
+    return content ? `评论了你的动态：${content}` : '评论了你的动态'
+  }
+
+  return '关注了你'
+}
+
+const getNotificationIcon = (type: NotificationType) => {
+  if (type === 'like') return '❤'
+  if (type === 'comment') return '💬'
+  return '👤'
+}
+
+const mapNotification = (notification: SocialNotification): NotificationItem => {
+  const nickname = notification.actor?.nickname || '新朋友'
+  const images = resolveMediaUrls(notification.post?.images ?? undefined)
+
+  return {
+    id: notification.id,
+    type: notification.type,
+    icon: getNotificationIcon(notification.type),
+    username: nickname,
+    avatar: resolveMediaUrl(notification.actor?.avatar) || createDefaultAvatar(nickname),
+    action: buildActionText(notification),
+    time: formatTime(notification.createdAt),
+    thumbnail: images[0] || '',
+    isRead: Boolean(notification.isRead),
+    postId: notification.postId || '',
+    actorId: notification.actorId
+  }
+}
+
+const loadNotifications = async (refresh = false) => {
+  if (loading.value) return
+
+  if (refresh) {
+    page.value = 1
+    hasMore.value = true
+    notifications.value = []
+  }
+
+  if (!hasMore.value) return
+
+  loading.value = true
+
+  try {
+    const res = await getNotifications({
+      page: page.value,
+      limit: limit.value
+    })
+    const items = res.data.map(mapNotification)
+
+    if (refresh) {
+      notifications.value = items
+    } else {
+      notifications.value = [...notifications.value, ...items]
+    }
+
+    hasMore.value = page.value < res.totalPages
+    page.value += 1
+  } catch (error) {
+    console.error('加载通知失败:', error)
+  } finally {
+    loading.value = false
+  }
+}
 
 const handleBack = () => {
   uni.navigateBack()
 }
 
-const handleMarkAllRead = () => {
-  notifications.value.forEach(n => n.isRead = true)
-  uni.showToast({
-    title: '已全部标记为已读',
-    icon: 'success'
-  ,
-      duration: 2000
-    })
+const syncUnreadState = () => {
+  uni.$emit('notifications:updated')
 }
 
-const handleNotificationClick = (notification: any) => {
-  notification.isRead = true
+const markAsReadIfNeeded = async (notification: NotificationItem) => {
+  if (notification.isRead) {
+    return
+  }
 
-  if (notification.type === 'like' || notification.type === 'comment') {
-    uni.navigateTo({
-      url: `/pages/post-detail/post-detail?id=${notification.targetId}`
+  await markNotificationRead(notification.id)
+  notification.isRead = true
+  syncUnreadState()
+}
+
+const handleMarkAllRead = async () => {
+  try {
+    const res = await markAllNotificationsRead()
+
+    if (!res.count) {
+      uni.showToast({
+        title: '暂无未读通知',
+        icon: 'none'
+      })
+      return
+    }
+
+    notifications.value.forEach((item) => {
+      item.isRead = true
     })
-  } else if (notification.type === 'follow') {
-    uni.navigateTo({
-      url: `/pages/user-profile/user-profile?id=${notification.targetId}`
+    syncUnreadState()
+    uni.showToast({
+      title: '已全部标记为已读',
+      icon: 'success'
     })
+  } catch (error) {
+    console.error('标记通知已读失败:', error)
   }
 }
+
+const handleNotificationClick = async (notification: NotificationItem) => {
+  try {
+    await markAsReadIfNeeded(notification)
+
+    if (notification.type === 'follow' && notification.actorId) {
+      uni.navigateTo({
+        url: `/pages/user-profile/user-profile?id=${notification.actorId}`
+      })
+      return
+    }
+
+    if (notification.postId) {
+      uni.navigateTo({
+        url: `/pages/post-detail/post-detail?id=${notification.postId}`
+      })
+    }
+  } catch (error) {
+    console.error('处理通知点击失败:', error)
+  }
+}
+
+const handleLoadMore = () => {
+  if (!loading.value && hasMore.value) {
+    loadNotifications()
+  }
+}
+
+onShow(() => {
+  loadNotifications(true)
+})
 </script>
 
 <style scoped>
-/* 已优化为跨平台样式，使用rpx单位 */
-/* 使用 #ifdef H5 / #ifdef MP 添加平台特定样式 */
-
 .notification-page {
   min-height: 100vh;
   background: #f8f8f8;
@@ -155,6 +285,7 @@ const handleNotificationClick = (notification: any) => {
 
 .notification-list {
   height: calc(100vh - 88rpx);
+  box-sizing: border-box;
 }
 
 .notification-item {
@@ -171,35 +302,50 @@ const handleNotificationClick = (notification: any) => {
   background: #f0f7ff;
 }
 
-.notification-icon {
-  width: 80rpx;
-  height: 80rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 40rpx;
-  border-radius: 50%;
+.notification-avatar-wrap {
+  position: relative;
+  width: 88rpx;
+  height: 88rpx;
   flex-shrink: 0;
 }
 
-.notification-icon.like {
-  background: #ffe6e6;
-}
-
-.notification-icon.comment {
-  background: #e6f7ff;
-}
-
-.notification-icon.follow {
+.notification-avatar {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 50%;
   background: #f0f0f0;
 }
 
-.notification-icon.system {
-  background: #fff7e6;
+.notification-icon {
+  position: absolute;
+  right: -4rpx;
+  bottom: -4rpx;
+  width: 36rpx;
+  height: 36rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20rpx;
+  border-radius: 50%;
+  color: #ffffff;
+  border: 4rpx solid #ffffff;
+}
+
+.notification-icon.like {
+  background: #ff6b81;
+}
+
+.notification-icon.comment {
+  background: #4dabf7;
+}
+
+.notification-icon.follow {
+  background: #51cf66;
 }
 
 .notification-content {
   flex: 1;
+  min-width: 0;
 }
 
 .notification-text {
@@ -226,8 +372,9 @@ const handleNotificationClick = (notification: any) => {
 .notification-thumbnail {
   width: 100rpx;
   height: 100rpx;
-  border-radius: 8rpx;
+  border-radius: 12rpx;
   flex-shrink: 0;
+  background: #f5f5f5;
 }
 
 .unread-dot {
@@ -238,5 +385,30 @@ const handleNotificationClick = (notification: any) => {
   height: 16rpx;
   background: #ff4d4f;
   border-radius: 50%;
+}
+
+.status-text {
+  text-align: center;
+  padding: 32rpx;
+  font-size: 26rpx;
+  color: #999;
+}
+
+.empty-state {
+  padding: 160rpx 48rpx;
+  text-align: center;
+}
+
+.empty-title {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.empty-desc {
+  margin-top: 16rpx;
+  font-size: 26rpx;
+  line-height: 1.6;
+  color: #999;
 }
 </style>

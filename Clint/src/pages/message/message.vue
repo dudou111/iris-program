@@ -16,7 +16,7 @@
       >
         <view class="message-avatar">
           <image :src="item.avatar" class="avatar-img" mode="aspectFill" />
-          <view v-if="item.unread" class="badge-dot"></view>
+          <view v-if="item.unreadCount > 0" class="badge-dot"></view>
         </view>
         <view class="message-content">
           <view class="message-header">
@@ -26,67 +26,91 @@
           <view class="message-preview">{{ item.lastMessage }}</view>
         </view>
       </view>
+      <view v-if="loading" class="status-text">加载中...</view>
+      <view v-else-if="messages.length === 0" class="status-text">还没有聊天记录，去和同学打个招呼吧</view>
     </scroll-view>
   </view>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
+import { getConversations, type Conversation } from '@/api/messages'
+import { createDefaultAvatar, resolveMediaUrl } from '@/utils/media'
 
-const messages = ref([
-  {
-    id: 1,
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Zhang2',
-    name: '张同学',
-    lastMessage: '好的，明天见！',
-    time: '10:30',
-    unread: true
-  },
-  {
-    id: 2,
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Li2',
-    name: '李同学',
-    lastMessage: '这本书我已经看完了',
-    time: '昨天',
-    unread: false
-  },
-  {
-    id: 3,
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=System',
-    name: '系统通知',
-    lastMessage: '您有新的点赞和评论',
-    time: '09-15',
-    unread: true,
-    isSystem: true
-  },
-  {
-    id: 4,
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Wang2',
-    name: '王同学',
-    lastMessage: '周末一起打球吗？',
-    time: '09-14',
-    unread: false
-  }
-])
-
-const handleSettings = () => {
-  uni.showToast({ title: '设置功能开发中', icon: 'none' ,
-      duration: 2000
-    })
+interface MessageListItem {
+  id: string
+  userId: string
+  avatar: string
+  name: string
+  lastMessage: string
+  time: string
+  unreadCount: number
 }
 
-const handleItemClick = (item: any) => {
-  if (item.isSystem) {
-    uni.navigateTo({
-    url: '/pages/notification/notification',
+const messages = ref<MessageListItem[]>([])
+const loading = ref(false)
+
+const formatTime = (dateString: string) => {
+  const date = new Date(dateString)
+  const now = new Date()
+  const diff = now.getTime() - date.getTime()
+  const minutes = Math.floor(diff / 60000)
+  const hours = Math.floor(diff / 3600000)
+  const days = Math.floor(diff / 86400000)
+
+  if (minutes < 1) return '刚刚'
+  if (minutes < 60) return `${minutes}分钟前`
+  if (hours < 24) return `${hours}小时前`
+  if (days < 7) return `${days}天前`
+
+  return date.toLocaleDateString('zh-CN')
+}
+
+const mapConversation = (conversation: Conversation): MessageListItem => ({
+  id: conversation.user.id,
+  userId: conversation.user.id,
+  avatar:
+    resolveMediaUrl(conversation.user.avatar) ||
+    createDefaultAvatar(conversation.user.nickname || conversation.user.id),
+  name: conversation.user.nickname || '未知用户',
+  lastMessage: conversation.lastMessage.content || '开始聊天吧',
+  time: formatTime(conversation.lastMessage.createdAt),
+  unreadCount: conversation.unreadCount || 0
+})
+
+const loadConversations = async () => {
+  loading.value = true
+
+  try {
+    const res = await getConversations({ page: 1, limit: 50 })
+    messages.value = res.data.map(mapConversation)
+  } catch (error) {
+    console.error('加载会话列表失败:', error)
+    uni.showToast({ title: '加载消息失败', icon: 'none' })
+  } finally {
+    loading.value = false
+  }
+}
+
+const handleSettings = () => {
+  uni.showToast({ title: '设置功能开发中', icon: 'none', duration: 2000 })
+}
+
+const handleItemClick = (item: MessageListItem) => {
+  const query = `id=${item.userId}&nickname=${encodeURIComponent(item.name)}&avatar=${encodeURIComponent(item.avatar)}`
+
+  uni.navigateTo({
+    url: `/pages/chat/chat?${query}`,
     fail: (err) => {
       console.error('页面跳转失败:', err)
     }
   })
-  } else {
-    uni.navigateTo({ url: `/pages/chat/chat?id=${item.id}` })
-  }
 }
+
+onShow(() => {
+  loadConversations()
+})
 </script>
 
 <style scoped>
@@ -196,5 +220,12 @@ const handleItemClick = (item: any) => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.status-text {
+  padding: 64rpx 32rpx;
+  text-align: center;
+  font-size: 28rpx;
+  color: #999;
 }
 </style>

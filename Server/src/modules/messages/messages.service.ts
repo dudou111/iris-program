@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Message } from './message.entity';
@@ -9,31 +9,77 @@ export class MessagesService {
   constructor(
     @InjectRepository(Message)
     private messagesRepository: Repository<Message>,
+    @Inject('MESSAGES_REALTIME_SERVICE')
+    private readonly messagesRealtimeService: {
+      publishMessage(message: Message): Promise<void> | void;
+    },
   ) {}
 
   async findConversations(userId: string, page = 1, limit = 20) {
+    const pageNum = Number(page) || 1;
+    const limitNum = Number(limit) || 20;
     const messages = await this.messagesRepository
       .createQueryBuilder('message')
       .leftJoinAndSelect('message.sender', 'sender')
       .leftJoinAndSelect('message.receiver', 'receiver')
       .where('message.senderId = :userId OR message.receiverId = :userId', { userId })
       .orderBy('message.createdAt', 'DESC')
-      .skip((page - 1) * limit)
-      .take(limit)
       .getMany();
 
-    const conversationsMap = new Map();
+    const conversationsMap = new Map<
+      string,
+      {
+        user: {
+          id: string;
+          nickname: string;
+          avatar: string;
+        };
+        lastMessage: {
+          content: string;
+          createdAt: Date;
+        };
+        unreadCount: number;
+      }
+    >();
 
     messages.forEach((message) => {
       const otherUserId = message.senderId === userId ? message.receiverId : message.senderId;
-      if (!conversationsMap.has(otherUserId)) {
-        conversationsMap.set(otherUserId, message);
+      const otherUser = message.senderId === userId ? message.receiver : message.sender;
+      const existingConversation = conversationsMap.get(otherUserId);
+
+      if (!existingConversation) {
+        conversationsMap.set(otherUserId, {
+          user: {
+            id: otherUser.id,
+            nickname: otherUser.nickname,
+            avatar: otherUser.avatar,
+          },
+          lastMessage: {
+            content: message.content,
+            createdAt: message.createdAt,
+          },
+          unreadCount: 0,
+        });
+      }
+
+      if (message.receiverId === userId && !message.isRead) {
+        const conversation = conversationsMap.get(otherUserId);
+        if (conversation) {
+          conversation.unreadCount += 1;
+        }
       }
     });
 
+    const conversations = Array.from(conversationsMap.values());
+    const start = (pageNum - 1) * limitNum;
+    const pagedConversations = conversations.slice(start, start + limitNum);
+
     return {
-      data: Array.from(conversationsMap.values()),
-      total: conversationsMap.size,
+      data: pagedConversations,
+      total: conversations.length,
+      page: pageNum,
+      limit: limitNum,
+      totalPages: Math.ceil(conversations.length / limitNum) || 1,
     };
   }
 
@@ -64,7 +110,16 @@ export class MessagesService {
       senderId,
     });
 
-    return this.messagesRepository.save(message);
+    const saved = await this.messagesRepository.save(message);
+    const hydrated =
+      (await this.messagesRepository.findOne({
+        where: { id: saved.id },
+        relations: ['sender', 'receiver'],
+      })) || saved;
+
+    await this.messagesRealtimeService.publishMessage(hydrated);
+
+    return hydrated;
   }
 
   async markAsRead(userId: string, messageId: string) {

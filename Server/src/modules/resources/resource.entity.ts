@@ -62,4 +62,6 @@ export class Resource {
 
   @Column()
   authorId: string;
+
+  isCollected?: boolean;
 }

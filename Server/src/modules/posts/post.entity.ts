@@ -64,4 +64,8 @@ export class Post {
 
   @OneToMany(() => Comment, (comment) => comment.post)
   comments: Comment[];
+
+  isLiked?: boolean;
+
+  isCollected?: boolean;
 }

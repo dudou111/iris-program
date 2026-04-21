@@ -114,8 +114,14 @@ const handleLogin = async () => {
       password: formData.password
     })
 
+    const token = res.accessToken || res.access_token
+
+    if (!token) {
+      throw new Error('登录响应缺少 token')
+    }
+
     // 保存token
-    setToken(res.access_token)
+    setToken(token)
 
     // 保存用户信息
     uni.setStorageSync('userInfo', res.user)

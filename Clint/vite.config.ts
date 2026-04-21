@@ -7,9 +7,10 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://127.0.0.1:3000", // 后端端口
+        target: "http://127.0.0.1:3001", // 后端端口
         changeOrigin: true,
         secure: false,
+        ws: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
     },

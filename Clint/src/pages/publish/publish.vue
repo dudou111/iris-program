@@ -38,9 +38,12 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { createPost } from '@/api/posts'
+import { uploadPostImages } from '@/api/upload'
 
 const content = ref('')
 const images = ref<string[]>([])
+const submitting = ref(false)
 
 const topics = ref([
   { id: 'study', name: '学习' },
@@ -55,27 +58,42 @@ const handleCancel = () => {
   uni.navigateBack()
 }
 
-const handlePublish = () => {
-  if (!content.value.trim()) {
+const handlePublish = async () => {
+  if (!content.value.trim() || submitting.value) {
     uni.showToast({
       title: '请输入内容',
       icon: 'none'
-    ,
-      duration: 2000
     })
     return
   }
 
-  uni.showToast({
-    title: '发布成功',
-    icon: 'success'
-  ,
+  submitting.value = true
+
+  try {
+    const uploaded = images.value.length ? await uploadPostImages(images.value) : []
+
+    await createPost({
+      content: content.value.trim(),
+      category: selectedTopic.value.id,
+      images: uploaded.map((item) => item.url)
+    })
+
+    uni.showToast({
+      title: '发布成功',
+      icon: 'success',
       duration: 2000
     })
 
-  setTimeout(() => {
-    uni.navigateBack()
-  }, 1500)
+    uni.$emit('post:published')
+
+    setTimeout(() => {
+      uni.navigateBack()
+    }, 1200)
+  } catch (error) {
+    console.error('发布失败:', error)
+  } finally {
+    submitting.value = false
+  }
 }
 
 const chooseImage = () => {

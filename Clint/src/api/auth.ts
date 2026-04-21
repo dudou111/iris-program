@@ -22,7 +22,8 @@ export interface WechatLoginDto {
 
 // 登录响应
 export interface LoginResponse {
-  access_token: string
+  access_token?: string
+  accessToken?: string
   user: {
     id: string
     username: string

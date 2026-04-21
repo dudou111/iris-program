@@ -10,6 +10,9 @@ import { ActivitiesModule } from './modules/activities/activities.module';
 import { CirclesModule } from './modules/circles/circles.module';
 import { CommentsModule } from './modules/comments/comments.module';
 import { MessagesModule } from './modules/messages/messages.module';
+import { UploadModule } from './modules/upload/upload.module';
+import { SearchModule } from './modules/search/search.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -28,6 +31,9 @@ import { MessagesModule } from './modules/messages/messages.module';
     CirclesModule,
     CommentsModule,
     MessagesModule,
+    NotificationsModule,
+    UploadModule,
+    SearchModule,
   ],
 })
 export class AppModule {}

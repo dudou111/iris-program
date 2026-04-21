@@ -14,170 +14,240 @@
       <text>加载中...</text>
     </view>
 
-    <view v-else-if="post" class="post-content">
-      <view class="post-header">
-        <image :src="post.avatar" class="post-avatar" mode="aspectFill" @tap="handleUserClick" />
-        <view class="post-user">
-          <view class="post-username">{{ post.username }}</view>
-          <view class="post-time">{{ post.time }}</view>
+    <template v-else-if="post">
+      <view class="post-content">
+        <view class="post-header">
+          <image :src="post.avatar" class="post-avatar" mode="aspectFill" @tap="handleUserClick" />
+          <view class="post-user" @tap="handleUserClick">
+            <view class="post-username">{{ post.username }}</view>
+            <view class="post-time">{{ post.time }}</view>
+          </view>
+          <view
+            v-if="canFollowAuthor"
+            class="btn-follow"
+            :class="{ following: post.isFollowing }"
+            @tap="handleFollow"
+          >
+            {{ post.isFollowing ? '已关注' : '关注' }}
+          </view>
         </view>
-        <view class="btn-follow" :class="{ following: post.isFollowing }" @tap="handleFollow">
-          {{ post.isFollowing ? '已关注' : '关注' }}
+
+        <view class="post-text">{{ post.content }}</view>
+
+        <view
+          v-if="post.images.length"
+          class="post-images"
+          :class="getImageClass(post.images.length)"
+        >
+          <image
+            v-for="(image, index) in post.images"
+            :key="index"
+            :src="image"
+            class="post-image"
+            mode="aspectFill"
+            @tap="handleImagePreview(post.images, index)"
+          />
+        </view>
+
+        <view class="post-tags">
+          <view v-if="post.location" class="tag">
+            <text>📍 {{ post.location }}</text>
+          </view>
+          <view v-if="post.topic" class="tag">
+            <text># {{ post.topic }}</text>
+          </view>
+        </view>
+
+        <view class="post-stats">
+          <text>{{ post.likes }} 点赞</text>
+          <text>{{ post.comments }} 评论</text>
+          <text>{{ post.collects }} 收藏</text>
+        </view>
+
+        <view class="post-actions">
+          <view class="action-btn" :class="{ active: post.isLiked }" @tap="handleLike">
+            <text>{{ post.isLiked ? '❤️' : '🤍' }}</text>
+            <text>点赞</text>
+          </view>
+          <view class="action-btn" @tap="focusCommentInput">
+            <text>💬</text>
+            <text>评论</text>
+          </view>
+          <view class="action-btn" :class="{ active: post.isCollected }" @tap="handleCollect">
+            <text>{{ post.isCollected ? '⭐' : '☆' }}</text>
+            <text>收藏</text>
+          </view>
+          <view class="action-btn" @tap="handleShare">
+            <text>↗️</text>
+            <text>分享</text>
+          </view>
         </view>
       </view>
 
-      <view class="post-text">{{ post.content }}</view>
+      <view class="comments-section">
+        <view class="section-title">评论 {{ post.comments }}</view>
+        <view v-if="comments.length === 0" class="empty-comments">还没有评论，来抢沙发吧</view>
+        <view v-for="comment in comments" :key="comment.id" class="comment-item">
+          <image :src="comment.avatar" class="comment-avatar" mode="aspectFill" />
+          <view class="comment-content">
+            <view class="comment-header">
+              <text class="comment-username">{{ comment.username }}</text>
+              <text class="comment-time">{{ comment.time }}</text>
+            </view>
+            <view class="comment-text">
+              <text v-if="comment.replyToUsername" class="comment-reply-prefix">
+                回复 @{{ comment.replyToUsername }}：
+              </text>
+              <text>{{ comment.content }}</text>
+            </view>
+            <view class="comment-actions">
+              <view class="comment-action" :class="{ active: comment.isLiked }" @tap="handleCommentLike(comment)">
+                <text>{{ comment.isLiked ? '❤️' : '🤍' }} {{ comment.likes }}</text>
+              </view>
+              <view class="comment-action" @tap="handleReply(comment)">
+                <text>💬 回复</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
 
-      <view v-if="post.images && post.images.length" class="post-images" :class="getImageClass(post.images.length)">
-        <image
-          v-for="(image, index) in post.images"
-          :key="index"
-          :src="image"
-          class="post-image"
-          mode="aspectFill"
-          @tap="handleImagePreview(post.images, index)"
+      <view class="comment-input-bar">
+        <view v-if="replyTarget" class="reply-tip" @tap="clearReplyTarget">
+          正在回复 {{ replyTarget.username }}，点此取消
+        </view>
+        <input
+          v-model="commentText"
+          class="comment-input"
+          type="text"
+          :placeholder="commentPlaceholder"
+          :adjust-position="true"
+          :hold-keyboard="false"
+          :cursor-spacing="50"
+          placeholder-style="color: #999;"
         />
-      </view>
-
-      <view class="post-tags">
-        <view v-if="post.location" class="tag">
-          <text>📍 {{ post.location }}</text>
-        </view>
-        <view v-if="post.topic" class="tag">
-          <text># {{ post.topic }}</text>
+        <view class="btn-send" :class="{ disabled: !commentText.trim() }" @tap="handleSendComment">
+          发送
         </view>
       </view>
-
-      <view class="post-stats">
-        <text>{{ post.likes }} 点赞</text>
-        <text>{{ post.comments }} 评论</text>
-        <text>{{ post.collects }} 收藏</text>
-      </view>
-
-      <view class="post-actions">
-        <view class="action-btn" :class="{ active: post.isLiked }" @tap="handleLike">
-          <text>{{ post.isLiked ? '❤️' : '🤍' }}</text>
-          <text>点赞</text>
-        </view>
-        <view class="action-btn">
-          <text>💬</text>
-          <text>评论</text>
-        </view>
-        <view class="action-btn" :class="{ active: post.isCollected }" @tap="handleCollect">
-          <text>{{ post.isCollected ? '⭐' : '☆' }}</text>
-          <text>收藏</text>
-        </view>
-        <view class="action-btn" @tap="handleShare">
-          <text>↗️</text>
-          <text>分享</text>
-        </view>
-      </view>
-    </view>
-
-    <view class="comments-section">
-      <view class="section-title">评论 {{ comments.length }}</view>
-      <view v-for="comment in comments" :key="comment.id" class="comment-item">
-        <image :src="comment.avatar" class="comment-avatar" mode="aspectFill" />
-        <view class="comment-content">
-          <view class="comment-header">
-            <text class="comment-username">{{ comment.username }}</text>
-            <text class="comment-time">{{ comment.time }}</text>
-          </view>
-          <view class="comment-text">{{ comment.content }}</view>
-          <view class="comment-actions">
-            <view class="comment-action" :class="{ active: comment.isLiked }" @tap="handleCommentLike(comment)">
-              <text>{{ comment.isLiked ? '❤️' : '🤍' }} {{ comment.likes }}</text>
-            </view>
-            <view class="comment-action" @tap="handleReply(comment)">
-              <text>💬 回复</text>
-            </view>
-          </view>
-        </view>
-      </view>
-    </view>
+    </template>
 
     <view v-else class="error-container">
       <text>加载失败</text>
-    </view>
-
-    <view v-if="post" class="comment-input-bar">
-      <input
-        v-model="commentText"
-        type="text"
-        placeholder="说点什么..."
-        class="comment-input"
-        @focus="handleInputFocus"
-      /
-            :adjust-position="true"
-            :hold-keyboard="false"
-            :cursor-spacing="50"
-            placeholder-style="color: #999;"
-          >
-      <view class="btn-send" :class="{ disabled: !commentText.trim() }" @tap="handleSendComment">
-        发送
-      </view>
     </view>
   </view>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { getPostDetail, likePost, unlikePost, collectPost, uncollectPost } from '@/api/posts'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
+import {
+  collectPost,
+  getPostDetail,
+  likePost,
+  type Post,
+  uncollectPost,
+  unlikePost
+} from '@/api/posts'
+import {
+  createComment,
+  getPostComments,
+  likeComment,
+  type Comment,
+  unlikeComment
+} from '@/api/comments'
+import { followUser, unfollowUser } from '@/api/users'
+import { createDefaultAvatar, resolveMediaUrl, resolveMediaUrls } from '@/utils/media'
+import { getToken } from '@/utils/request'
 
-const post = ref<any>(null)
-const comments = ref<any[]>([])
+interface DetailPost {
+  id: string
+  authorId: string
+  avatar: string
+  username: string
+  time: string
+  content: string
+  images: string[]
+  location?: string
+  topic: string
+  likes: number
+  comments: number
+  collects: number
+  isLiked: boolean
+  isCollected: boolean
+  isFollowing: boolean
+}
+
+interface DetailComment {
+  id: string
+  authorId: string
+  avatar: string
+  username: string
+  time: string
+  content: string
+  likes: number
+  isLiked: boolean
+  replyToUsername?: string
+}
+
+interface ReplyTarget {
+  id: string
+  authorId: string
+  username: string
+}
+
+interface PostUpdatePayload {
+  id: string
+  likes?: number
+  comments?: number
+  collects?: number
+  isLiked?: boolean
+  isCollected?: boolean
+  isCommented?: boolean
+}
+
+const post = ref<DetailPost | null>(null)
+const comments = ref<DetailComment[]>([])
 const commentText = ref('')
+const replyTarget = ref<ReplyTarget | null>(null)
 const loading = ref(true)
 
-// 获取动态ID
+const getCurrentUserId = () => (uni.getStorageSync('userInfo')?.id || '') as string
+
+const commentPlaceholder = computed(() =>
+  replyTarget.value ? `回复 ${replyTarget.value.username}...` : '说点什么...'
+)
+
+const canFollowAuthor = computed(
+  () => Boolean(post.value) && post.value!.authorId !== getCurrentUserId()
+)
+
+const requireLogin = () => {
+  if (getToken()) {
+    return true
+  }
+
+  uni.showToast({
+    title: '请先登录',
+    icon: 'none'
+  })
+  setTimeout(() => {
+    uni.navigateTo({
+      url: '/pages/login/login'
+    })
+  }, 500)
+  return false
+}
+
 const getPostId = () => {
   const pages = getCurrentPages()
-  const currentPage = pages[pages.length - 1]
-  return (currentPage as any).$page.options.id || ''
+  const currentPage = pages[pages.length - 1] as { $page?: { options?: Record<string, string> } }
+  return currentPage?.$page?.options?.id || ''
 }
 
-// 加载动态详情
-const loadPostDetail = async () => {
-  loading.value = true
-  try {
-    const id = getPostId()
-    if (!id) {
-      uni.showToast({ title: '动态ID不存在', icon: 'none' })
-      setTimeout(() => uni.navigateBack(), 1500)
-      return
-    }
-
-    const res = await getPostDetail(id)
-    post.value = {
-      id: res.id,
-      avatar: res.author?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=default',
-      username: res.author?.nickname || '未知用户',
-      time: formatTime(res.createdAt),
-      content: res.content,
-      images: res.images || [],
-      location: res.location,
-      topic: res.category,
-      likes: res.likesCount,
-      comments: res.commentsCount,
-      collects: res.collectionsCount,
-      isLiked: false,
-      isCollected: false,
-      isFollowing: false
-    }
-  } catch (error) {
-    console.error('加载动态详情失败:', error)
-    uni.showToast({ title: '加载失败', icon: 'none' })
-  } finally {
-    loading.value = false
-  }
-}
-
-// 格式化时间
 const formatTime = (dateString: string) => {
   const date = new Date(dateString)
   const now = new Date()
   const diff = now.getTime() - date.getTime()
-
   const minutes = Math.floor(diff / 60000)
   const hours = Math.floor(diff / 3600000)
   const days = Math.floor(diff / 86400000)
@@ -190,10 +260,91 @@ const formatTime = (dateString: string) => {
   return date.toLocaleDateString('zh-CN')
 }
 
+const mapPost = (res: Post): DetailPost => ({
+  id: res.id,
+  authorId: res.author.id,
+  avatar: resolveMediaUrl(res.author.avatar) || createDefaultAvatar(res.author.nickname || res.id),
+  username: res.author.nickname || '未知用户',
+  time: formatTime(res.createdAt),
+  content: res.content,
+  images: resolveMediaUrls(res.images),
+  location: res.location,
+  topic: res.category,
+  likes: res.likesCount,
+  comments: res.commentsCount,
+  collects: res.collectionsCount,
+  isLiked: Boolean(res.isLiked),
+  isCollected: Boolean(res.isCollected),
+  isFollowing: Boolean(res.author.isFollowing)
+})
+
+const mapComment = (item: Comment): DetailComment => ({
+  id: item.id,
+  authorId: item.author.id,
+  avatar: resolveMediaUrl(item.author.avatar) || createDefaultAvatar(item.author.nickname || item.id),
+  username: item.author.nickname || '未知用户',
+  time: formatTime(item.createdAt),
+  content: item.content,
+  likes: item.likesCount,
+  isLiked: Boolean(item.isLiked),
+  replyToUsername: item.replyToUser?.nickname
+})
+
 const getImageClass = (count: number) => {
   if (count === 1) return 'single'
   if (count === 2) return 'double'
   return 'multiple'
+}
+
+const emitPostUpdated = (extra: Partial<PostUpdatePayload> = {}) => {
+  if (!post.value) {
+    return
+  }
+
+  uni.$emit('post:updated', {
+    id: post.value.id,
+    likes: post.value.likes,
+    comments: post.value.comments,
+    collects: post.value.collects,
+    isLiked: post.value.isLiked,
+    isCollected: post.value.isCollected,
+    ...extra
+  } satisfies PostUpdatePayload)
+}
+
+const loadPostDetail = async () => {
+  const id = getPostId()
+  if (!id) {
+    uni.showToast({ title: '动态ID不存在', icon: 'none' })
+    setTimeout(() => uni.navigateBack(), 1500)
+    return
+  }
+
+  const res = await getPostDetail(id)
+  post.value = mapPost(res)
+}
+
+const loadComments = async () => {
+  const id = getPostId()
+  if (!id) {
+    comments.value = []
+    return
+  }
+
+  const res = await getPostComments(id, { page: 1, limit: 50 })
+  comments.value = res.data.map(mapComment)
+}
+
+const initializePage = async () => {
+  loading.value = true
+  try {
+    await Promise.all([loadPostDetail(), loadComments()])
+  } catch (error) {
+    console.error('加载动态详情失败:', error)
+    uni.showToast({ title: '加载失败', icon: 'none' })
+  } finally {
+    loading.value = false
+  }
 }
 
 const handleBack = () => {
@@ -202,67 +353,83 @@ const handleBack = () => {
 
 const handleMore = () => {
   uni.showActionSheet({
-    itemList: ['举报', '删除'],
+    itemList: ['举报', '复制内容'],
     success: (res) => {
-      console.log('选择了：', res.tapIndex)
+      if (res.tapIndex === 1 && post.value) {
+        uni.setClipboardData({ data: post.value.content })
+      }
     }
   })
 }
 
 const handleUserClick = () => {
-  uni.showToast({ title: '跳转用户主页', icon: 'none', duration: 2000 })
-}
-
-const handleFollow = () => {
   if (!post.value) return
-  post.value.isFollowing = !post.value.isFollowing
-  uni.showToast({
-    title: post.value.isFollowing ? '关注成功' : '取消关注',
-    icon: 'success',
-    duration: 2000
+
+  uni.navigateTo({
+    url: `/pages/user-profile/user-profile?id=${post.value.authorId}`
   })
 }
 
+const handleFollow = async () => {
+  if (!post.value || !canFollowAuthor.value || !requireLogin()) return
+
+  try {
+    if (post.value.isFollowing) {
+      const res = await unfollowUser(post.value.authorId)
+      post.value.isFollowing = Boolean(res.following)
+      uni.showToast({ title: '取消关注', icon: 'success' })
+    } else {
+      const res = await followUser(post.value.authorId)
+      post.value.isFollowing = Boolean(res.following)
+      uni.showToast({ title: '关注成功', icon: 'success' })
+    }
+  } catch (error) {
+    console.error('关注操作失败:', error)
+  }
+}
+
 const handleLike = async () => {
-  if (!post.value) return
+  if (!post.value || !requireLogin()) return
 
   try {
     if (post.value.isLiked) {
-      await unlikePost(post.value.id)
-      post.value.isLiked = false
-      post.value.likes--
+      const res = await unlikePost(post.value.id)
+      post.value.isLiked = Boolean(res.liked)
+      post.value.likes = res.likesCount
     } else {
-      await likePost(post.value.id)
-      post.value.isLiked = true
-      post.value.likes++
+      const res = await likePost(post.value.id)
+      post.value.isLiked = Boolean(res.liked)
+      post.value.likes = res.likesCount
     }
+    emitPostUpdated()
   } catch (error) {
     console.error('点赞操作失败:', error)
   }
 }
 
 const handleCollect = async () => {
-  if (!post.value) return
+  if (!post.value || !requireLogin()) return
 
   try {
     if (post.value.isCollected) {
-      await uncollectPost(post.value.id)
-      post.value.isCollected = false
-      post.value.collects--
-      uni.showToast({ title: '取消收藏', icon: 'success', duration: 2000 })
+      const res = await uncollectPost(post.value.id)
+      post.value.isCollected = Boolean(res.collected)
+      post.value.collects = res.collectionsCount
+      uni.showToast({ title: '取消收藏', icon: 'success' })
     } else {
-      await collectPost(post.value.id)
-      post.value.isCollected = true
-      post.value.collects++
-      uni.showToast({ title: '收藏成功', icon: 'success', duration: 2000 })
+      const res = await collectPost(post.value.id)
+      post.value.isCollected = Boolean(res.collected)
+      post.value.collects = res.collectionsCount
+      uni.showToast({ title: '收藏成功', icon: 'success' })
     }
+    emitPostUpdated()
   } catch (error) {
     console.error('收藏操作失败:', error)
   }
 }
 
 const handleShare = () => {
-  uni.showToast({ title: '分享功能开发中', icon: 'none', duration: 2000 })
+  uni.showToast({ title: '分享功能开发中', icon: 'none' })
 }
 
 const handleImagePreview = (images: string[], index: number) => {
@@ -272,43 +439,97 @@ const handleImagePreview = (images: string[], index: number) => {
   })
 }
 
-const handleCommentLike = (comment: any) => {
-  comment.isLiked = !comment.isLiked
-  comment.likes += comment.isLiked ? 1 : -1
+const handleCommentLike = async (comment: DetailComment) => {
+  if (!requireLogin()) return
+
+  try {
+    if (comment.isLiked) {
+      const res = await unlikeComment(comment.id)
+      comment.isLiked = Boolean(res.liked)
+      comment.likes = res.likesCount
+    } else {
+      const res = await likeComment(comment.id)
+      comment.isLiked = Boolean(res.liked)
+      comment.likes = res.likesCount
+    }
+  } catch (error) {
+    console.error('评论点赞失败:', error)
+  }
 }
 
-const handleReply = (comment: any) => {
-  commentText.value = `@${comment.username} `
+const handleReply = (comment: DetailComment) => {
+  if (!requireLogin()) return
+
+  replyTarget.value = {
+    id: comment.id,
+    authorId: comment.authorId,
+    username: comment.username
+  }
 }
 
-const handleInputFocus = () => {
-  console.log('输入框获得焦点')
+const clearReplyTarget = () => {
+  replyTarget.value = null
 }
 
-const handleSendComment = () => {
-  if (!commentText.value.trim()) return
+const focusCommentInput = () => {
+  if (!requireLogin()) return
+  clearReplyTarget()
+}
 
-  const newComment = {
-    id: comments.value.length + 1,
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Me',
-    username: '我',
-    time: '刚刚',
-    content: commentText.value,
-    likes: 0,
-    isLiked: false
+const handleSendComment = async () => {
+  const content = commentText.value.trim()
+
+  if (!content || !post.value || !requireLogin()) return
+
+  try {
+    await createComment({
+      content,
+      postId: post.value.id,
+      parentId: replyTarget.value?.id,
+      replyToUserId: replyTarget.value?.authorId
+    })
+
+    commentText.value = ''
+    clearReplyTarget()
+    await Promise.all([loadPostDetail(), loadComments()])
+    emitPostUpdated({
+      isCommented: true
+    })
+    uni.showToast({ title: '评论成功', icon: 'success' })
+  } catch (error) {
+    console.error('发送评论失败:', error)
+  }
+}
+
+const handleExternalPostUpdated = (payload: PostUpdatePayload) => {
+  if (!post.value || payload.id !== post.value.id) {
+    return
   }
 
-  comments.value.unshift(newComment)
-  if (post.value) {
-    post.value.comments++
+  if (payload.likes !== undefined) {
+    post.value.likes = payload.likes
   }
-  commentText.value = ''
-
-  uni.showToast({ title: '评论成功', icon: 'success', duration: 2000 })
+  if (payload.comments !== undefined) {
+    post.value.comments = payload.comments
+  }
+  if (payload.collects !== undefined) {
+    post.value.collects = payload.collects
+  }
+  if (payload.isLiked !== undefined) {
+    post.value.isLiked = payload.isLiked
+  }
+  if (payload.isCollected !== undefined) {
+    post.value.isCollected = payload.isCollected
+  }
 }
 
 onMounted(() => {
-  loadPostDetail()
+  initializePage()
+  uni.$on('post:updated', handleExternalPostUpdated)
+})
+
+onUnmounted(() => {
+  uni.$off('post:updated', handleExternalPostUpdated)
 })
 </script>
 
@@ -538,6 +759,10 @@ onMounted(() => {
   gap: 32rpx;
 }
 
+.comment-reply-prefix {
+  color: #1890ff;
+}
+
 .comment-action {
   font-size: 24rpx;
   color: #999;
@@ -552,14 +777,21 @@ onMounted(() => {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 120rpx;
+  min-height: 120rpx;
   padding: 16rpx 32rpx;
   background: #ffffff;
   border-top: 2rpx solid #e5e5e5;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 24rpx;
   z-index: 100;
+}
+
+.reply-tip {
+  width: 100%;
+  font-size: 24rpx;
+  color: #1890ff;
 }
 
 .comment-input {
@@ -594,5 +826,12 @@ onMounted(() => {
   min-height: 400rpx;
   font-size: 28rpx;
   color: #999;
+}
+
+.empty-comments {
+  padding: 40rpx 0;
+  font-size: 26rpx;
+  color: #999;
+  text-align: center;
 }
 </style>

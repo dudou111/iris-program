@@ -14,12 +14,11 @@
           @input="handleSearch"
           confirm-type="search"
           @confirm="handleSearchSubmit"
-        /
-            :adjust-position="true"
-            :hold-keyboard="false"
-            :cursor-spacing="50"
-            placeholder-style="color: #999;"
-          >
+          :adjust-position="true"
+          :hold-keyboard="false"
+          :cursor-spacing="50"
+          placeholder-style="color: #999;"
+        />
         <text v-if="searchQuery" class="clear-icon" @tap="handleClear">✕</text>
       </view>
     </view>
@@ -112,9 +111,36 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { searchAll } from '@/api/search'
+import { createDefaultAvatar, resolveMediaUrl } from '@/utils/media'
+
+interface SearchPostItem {
+  id: string
+  avatar: string
+  username: string
+  time: string
+  content: string
+}
+
+interface SearchUserItem {
+  id: string
+  avatar: string
+  username: string
+  bio: string
+}
+
+interface SearchResourceItem {
+  id: string
+  cover: string
+  title: string
+  category: string
+  downloads: number
+}
 
 const searchQuery = ref('')
 const currentTab = ref('posts')
+const searchTimer = ref<ReturnType<typeof setTimeout> | null>(null)
+const historyStorageKey = 'search-history'
 
 const resultTabs = [
   { key: 'posts', label: '动态' },
@@ -122,11 +148,7 @@ const resultTabs = [
   { key: 'resources', label: '资源' }
 ]
 
-const searchHistory = ref([
-  '图书馆',
-  '学习笔记',
-  '篮球赛'
-])
+const searchHistory = ref<string[]>(uni.getStorageSync(historyStorageKey) || [])
 
 const hotSearches = ref([
   '校园活动',
@@ -137,79 +159,117 @@ const hotSearches = ref([
 ])
 
 const searchResults = ref({
-  posts: [
-    {
-      id: 1,
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Zhang',
-      username: '张同学',
-      time: '2小时前',
-      content: '今天天气真好，图书馆学习一整天！'
-    },
-    {
-      id: 2,
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Li',
-      username: '李同学',
-      time: '5小时前',
-      content: '食堂新出的菜品真不错，推荐给大家！'
-    }
-  ],
-  users: [
-    {
-      id: 1,
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=User1',
-      username: '王同学',
-      bio: '计算机学院 | 热爱编程'
-    },
-    {
-      id: 2,
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=User2',
-      username: '刘同学',
-      bio: '设计学院 | UI/UX设计师'
-    }
-  ],
-  resources: [
-    {
-      id: 1,
-      cover: 'https://picsum.photos/100/100?random=1',
-      title: '高等数学复习资料',
-      category: '学习资料',
-      downloads: 128
-    },
-    {
-      id: 2,
-      cover: 'https://picsum.photos/100/100?random=2',
-      title: 'Python入门教程',
-      category: '编程',
-      downloads: 256
-    }
-  ]
+  posts: [] as SearchPostItem[],
+  users: [] as SearchUserItem[],
+  resources: [] as SearchResourceItem[]
 })
+
+const formatTime = (dateString: string) => {
+  const date = new Date(dateString)
+  const now = new Date()
+  const diff = now.getTime() - date.getTime()
+
+  const minutes = Math.floor(diff / 60000)
+  const hours = Math.floor(diff / 3600000)
+  const days = Math.floor(diff / 86400000)
+
+  if (minutes < 1) return '刚刚'
+  if (minutes < 60) return `${minutes}分钟前`
+  if (hours < 24) return `${hours}小时前`
+  if (days < 7) return `${days}天前`
+
+  return date.toLocaleDateString('zh-CN')
+}
+
+const persistHistory = () => {
+  uni.setStorageSync(historyStorageKey, searchHistory.value)
+}
+
+const recordSearch = (keyword: string) => {
+  const trimmed = keyword.trim()
+  if (!trimmed) return
+
+  searchHistory.value = [
+    trimmed,
+    ...searchHistory.value.filter((item) => item !== trimmed)
+  ].slice(0, 10)
+  persistHistory()
+}
+
+const executeSearch = async () => {
+  const keyword = searchQuery.value.trim()
+
+  if (!keyword) {
+    searchResults.value = {
+      posts: [],
+      users: [],
+      resources: []
+    }
+    return
+  }
+
+  try {
+    const response = await searchAll(keyword)
+    searchResults.value = {
+      posts: response.posts.data.map((post) => ({
+        id: post.id,
+        avatar: resolveMediaUrl(post.author?.avatar) || createDefaultAvatar(post.author?.nickname || post.id),
+        username: post.author?.nickname || '未知用户',
+        time: formatTime(post.createdAt),
+        content: post.content
+      })),
+      users: response.users.data.map((user) => ({
+        id: user.id,
+        avatar: resolveMediaUrl(user.avatar) || createDefaultAvatar(user.nickname || user.id),
+        username: user.nickname,
+        bio: user.bio || `${user.school || ''} ${user.college || ''}`.trim()
+      })),
+      resources: response.resources.data.map((resource) => ({
+        id: resource.id,
+        cover: resolveMediaUrl(resource.images?.[0]) || 'https://picsum.photos/100/100?random=1',
+        title: resource.title,
+        category: resource.category,
+        downloads: resource.collectionsCount
+      }))
+    }
+  } catch (error) {
+    console.error('搜索失败:', error)
+  }
+}
 
 const handleBack = () => {
   uni.navigateBack()
 }
 
 const handleSearch = () => {
-  console.log('搜索:', searchQuery.value)
+  if (searchTimer.value) {
+    clearTimeout(searchTimer.value)
+  }
+
+  searchTimer.value = setTimeout(() => {
+    executeSearch()
+  }, 250)
 }
 
 const handleSearchSubmit = () => {
   if (searchQuery.value.trim()) {
-    if (!searchHistory.value.includes(searchQuery.value)) {
-      searchHistory.value.unshift(searchQuery.value)
-      if (searchHistory.value.length > 10) {
-        searchHistory.value.pop()
-      }
-    }
+    recordSearch(searchQuery.value)
+    executeSearch()
   }
 }
 
 const handleClear = () => {
   searchQuery.value = ''
+  searchResults.value = {
+    posts: [],
+    users: [],
+    resources: []
+  }
 }
 
 const handleClearHistory = () => {
   searchHistory.value = []
+  persistHistory()
 }
 
 const handleHistoryClick = (item: string) => {

@@ -99,31 +99,31 @@ async function seed() {
     const posts = [
       {
         content: '今天学习了Vue3的Composition API，感觉比Options API更加灵活和强大。特别是在逻辑复用方面，使用composables可以很方便地抽取和共享逻辑。#前端 #Vue3 #技术分享',
-        images: JSON.stringify(['https://picsum.photos/400/300?random=10', 'https://picsum.photos/400/300?random=11']),
+        images: ['https://picsum.photos/400/300?random=10', 'https://picsum.photos/400/300?random=11'].join(','),
         category: 'study',
-        tags: JSON.stringify(['前端', 'Vue3', '技术分享']),
+        tags: ['前端', 'Vue3', '技术分享'].join(','),
         location: '图书馆',
         authorId: userIds[0].id
       },
       {
         content: '今天天气真好，在图书馆旁边拍到了超美的夕阳。分享给大家～ #校园 #摄影 #日常',
-        images: JSON.stringify(['https://picsum.photos/400/300?random=12']),
+        images: ['https://picsum.photos/400/300?random=12'].join(','),
         category: 'life',
-        tags: JSON.stringify(['校园', '摄影', '日常']),
+        tags: ['校园', '摄影', '日常'].join(','),
         location: '图书馆',
         authorId: userIds[2].id
       },
       {
         content: '最近在准备面试，想系统学习一下数据结构和算法。有没有好的书籍或者视频课程推荐？求大佬指点！#学习 #算法 #求助',
         category: 'study',
-        tags: JSON.stringify(['学习', '算法', '求助']),
+        tags: ['学习', '算法', '求助'].join(','),
         authorId: userIds[1].id
       },
       {
         content: '周末组织了一场篮球赛，玩得很开心！运动使人快乐💪 #运动 #篮球 #周末',
-        images: JSON.stringify(['https://picsum.photos/400/300?random=13', 'https://picsum.photos/400/300?random=14']),
+        images: ['https://picsum.photos/400/300?random=13', 'https://picsum.photos/400/300?random=14'].join(','),
         category: 'activity',
-        tags: JSON.stringify(['运动', '篮球', '周末']),
+        tags: ['运动', '篮球', '周末'].join(','),
         location: '体育馆',
         authorId: userIds[1].id
       }
@@ -143,36 +143,36 @@ async function seed() {
       {
         title: '计算机网络课程笔记',
         description: '整理的计算机网络课程笔记，包含TCP/IP协议、HTTP协议等内容，适合期末复习使用',
-        images: JSON.stringify(['https://picsum.photos/400/300?random=15']),
+        images: ['https://picsum.photos/400/300?random=15'].join(','),
         category: 'study',
         status: 'available',
         location: '图书馆',
         contact: '微信：student1',
-        tags: JSON.stringify(['计算机网络', '笔记', '课程']),
+        tags: ['计算机网络', '笔记', '课程'].join(','),
         authorId: userIds[0].id
       },
       {
         title: '高等数学习题集',
         description: '高等数学常见题型汇总，附带详细解答，九成新',
-        images: JSON.stringify(['https://picsum.photos/400/300?random=16']),
+        images: ['https://picsum.photos/400/300?random=16'].join(','),
         price: 15.00,
         category: 'study',
         status: 'available',
         location: '宿舍楼A栋',
         contact: 'QQ：123456',
-        tags: JSON.stringify(['数学', '习题', '学习资料']),
+        tags: ['数学', '习题', '学习资料'].join(','),
         authorId: userIds[1].id
       },
       {
         title: '二手自行车出售',
         description: '捷安特山地车，骑了一年，车况良好，因毕业低价转让',
-        images: JSON.stringify(['https://picsum.photos/400/300?random=17', 'https://picsum.photos/400/300?random=18']),
+        images: ['https://picsum.photos/400/300?random=17', 'https://picsum.photos/400/300?random=18'].join(','),
         price: 300.00,
         category: 'secondhand',
         status: 'available',
         location: '东门',
         contact: '电话：13800138000',
-        tags: JSON.stringify(['自行车', '二手', '交通工具']),
+        tags: ['自行车', '二手', '交通工具'].join(','),
         authorId: userIds[2].id
       },
       {
@@ -182,7 +182,7 @@ async function seed() {
         status: 'available',
         location: '图书馆门口',
         contact: '微信：student3',
-        tags: JSON.stringify(['失物招领', '校园卡']),
+        tags: ['失物招领', '校园卡'].join(','),
         authorId: userIds[2].id
       }
     ];
