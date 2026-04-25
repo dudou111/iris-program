@@ -4,12 +4,18 @@ import { Repository } from 'typeorm';
 import { Circle } from './circle.entity';
 import { CreateCircleDto } from './dto/create-circle.dto';
 import { UpdateCircleDto } from './dto/update-circle.dto';
+import { Activity } from '../activities/activity.entity';
+import { Resource } from '../resources/resource.entity';
 
 @Injectable()
 export class CirclesService {
   constructor(
     @InjectRepository(Circle)
     private circlesRepository: Repository<Circle>,
+    @InjectRepository(Activity)
+    private activitiesRepository: Repository<Activity>,
+    @InjectRepository(Resource)
+    private resourcesRepository: Repository<Resource>,
   ) {}
 
   async findAll(page = 1, limit = 20, category?: string) {
@@ -143,6 +149,58 @@ export class CirclesService {
       page,
       limit,
       totalPages: Math.ceil(circle.membersCount / limit),
+    };
+  }
+
+  async getActivities(circleId: string, page = 1, limit = 20) {
+    const circle = await this.circlesRepository.findOne({
+      where: { id: circleId, isDeleted: false },
+    });
+
+    if (!circle) {
+      throw new NotFoundException('圈子不存在');
+    }
+
+    const [activities, total] = await this.activitiesRepository.findAndCount({
+      where: { circleId, isDeleted: false },
+      relations: ['organizer'],
+      order: { startTime: 'ASC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return {
+      data: activities,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
+
+  async getResources(circleId: string, page = 1, limit = 20) {
+    const circle = await this.circlesRepository.findOne({
+      where: { id: circleId, isDeleted: false },
+    });
+
+    if (!circle) {
+      throw new NotFoundException('圈子不存在');
+    }
+
+    const [resources, total] = await this.resourcesRepository.findAndCount({
+      where: { circleId, isDeleted: false },
+      relations: ['author'],
+      order: { createdAt: 'DESC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return {
+      data: resources,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
     };
   }
 }

@@ -99,6 +99,7 @@ export class ResourcesService {
       images: normalizeStringArray(createResourceDto.images),
       tags: normalizeStringArray(createResourceDto.tags),
       authorId,
+      circleId: createResourceDto.circleId || null,
     });
 
     return this.resourcesRepository.save(resource);

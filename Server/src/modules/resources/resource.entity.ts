@@ -63,5 +63,12 @@ export class Resource {
   @Column()
   authorId: string;
 
+  @ManyToOne('Circle', { nullable: true })
+  @JoinColumn({ name: 'circleId' })
+  circle: any;
+
+  @Column({ nullable: true })
+  circleId: string;
+
   isCollected?: boolean;
 }

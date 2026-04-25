@@ -90,4 +90,24 @@ export class CirclesController {
   ) {
     return this.circlesService.getMembers(id, page, limit);
   }
+
+  @Get(':id/activities')
+  @ApiOperation({ summary: '获取圈子活动列表' })
+  getActivities(
+    @Param('id') id: string,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+  ) {
+    return this.circlesService.getActivities(id, page, limit);
+  }
+
+  @Get(':id/resources')
+  @ApiOperation({ summary: '获取圈子资源列表' })
+  getResources(
+    @Param('id') id: string,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+  ) {
+    return this.circlesService.getResources(id, page, limit);
+  }
 }

@@ -40,4 +40,9 @@ export class CreateResourceDto {
   @IsOptional()
   @IsArray()
   tags?: string[];
+
+  @ApiProperty({ description: '所属圈子ID', required: false })
+  @IsOptional()
+  @IsString()
+  circleId?: string;
 }

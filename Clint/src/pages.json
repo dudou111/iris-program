@@ -49,6 +49,24 @@
       }
     },
     {
+      "path": "pages/publish-circle/publish-circle",
+      "style": {
+        "navigationBarTitleText": "创建圈子"
+      }
+    },
+    {
+      "path": "pages/publish-activity/publish-activity",
+      "style": {
+        "navigationBarTitleText": "发布活动"
+      }
+    },
+    {
+      "path": "pages/publish-resource/publish-resource",
+      "style": {
+        "navigationBarTitleText": "发布资源"
+      }
+    },
+    {
       "path": "pages/profile/profile",
       "style": {
         "navigationBarTitleText": "个人中心"

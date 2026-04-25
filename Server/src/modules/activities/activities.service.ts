@@ -59,7 +59,10 @@ export class ActivitiesService {
   async create(organizerId: string, createActivityDto: CreateActivityDto) {
     const activity = this.activitiesRepository.create({
       ...createActivityDto,
+      startTime: new Date(createActivityDto.startTime),
+      endTime: new Date(createActivityDto.endTime),
       organizerId,
+      circleId: createActivityDto.circleId || null,
     });
 
     return this.activitiesRepository.save(activity);
@@ -72,7 +75,15 @@ export class ActivitiesService {
       throw new ForbiddenException('无权限修改此活动');
     }
 
-    Object.assign(activity, updateActivityDto);
+    Object.assign(activity, {
+      ...updateActivityDto,
+      startTime: updateActivityDto.startTime
+        ? new Date(updateActivityDto.startTime)
+        : activity.startTime,
+      endTime: updateActivityDto.endTime
+        ? new Date(updateActivityDto.endTime)
+        : activity.endTime,
+    });
     return this.activitiesRepository.save(activity);
   }
 

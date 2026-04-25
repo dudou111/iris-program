@@ -34,6 +34,11 @@
       <view v-else-if="activities.length === 0" class="loading-tip">暂无活动</view>
     </scroll-view>
 
+    <!-- 发布按钮 -->
+    <view class="fab" @tap="handlePublish">
+      <Icon name="plus" :size="24" color="#ffffff" />
+    </view>
+
     <custom-tab-bar />
   </view>
 </template>
@@ -42,8 +47,10 @@
 import { onMounted, ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import CustomTabBar from '@/components/custom-tab-bar/custom-tab-bar.vue'
+import Icon from '@/components/icon/icon.vue'
 import { getActivities, type Activity } from '@/api/activities'
 import { resolveMediaUrls } from '@/utils/media'
+import { getToken } from '@/utils/request'
 
 interface ActivityCardItem {
   id: string
@@ -125,14 +132,39 @@ const onLoadMore = () => {
   }
 }
 
+const requireLogin = () => {
+  if (getToken()) {
+    return true
+  }
+
+  uni.showToast({
+    title: '请先登录',
+    icon: 'none'
+  })
+  setTimeout(() => {
+    uni.navigateTo({ url: '/pages/login/login' })
+  }, 600)
+  return false
+}
+
+const handlePublish = () => {
+  if (!requireLogin()) return
+
+  uni.navigateTo({
+    url: '/pages/publish-activity/publish-activity',
+    fail: (err) => {
+      console.error('页面跳转失败:', err)
+    }
+  })
+}
+
 onMounted(() => {
   loadActivities(true)
 })
 
 onShow(() => {
-  if (!activities.value.length) {
-    loadActivities(true)
-  }
+  // 每次页面显示时都刷新数据，确保发布后能立即看到新内容
+  loadActivities(true)
 })
 </script>
 
@@ -225,4 +257,26 @@ onShow(() => {
   font-size: 28rpx;
   color: #999;
 }
+
+.fab {
+  position: fixed;
+  right: 32rpx;
+  bottom: 160rpx;
+  width: 112rpx;
+  height: 112rpx;
+  background: #1890ff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  transition: all 0.3s;
+}
+
+/* #ifdef H5 */
+.fab:hover {
+  transform: scale(1.1);
+}
+/* #endif */
 </style>

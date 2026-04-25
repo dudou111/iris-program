@@ -25,16 +25,21 @@ export class CreateActivityDto {
   @IsString()
   location: string;
 
-  @ApiProperty({ description: '开始时间' })
+  @ApiProperty({ description: '开始时间', type: String, format: 'date-time' })
   @IsDateString()
-  startTime: Date;
+  startTime: string;
 
-  @ApiProperty({ description: '结束时间' })
+  @ApiProperty({ description: '结束时间', type: String, format: 'date-time' })
   @IsDateString()
-  endTime: Date;
+  endTime: string;
 
   @ApiProperty({ description: '最大参与人数', required: false })
   @IsOptional()
   @IsNumber()
   maxParticipants?: number;
+
+  @ApiProperty({ description: '所属圈子ID', required: false })
+  @IsOptional()
+  @IsString()
+  circleId?: string;
 }

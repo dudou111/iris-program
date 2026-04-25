@@ -68,4 +68,11 @@ export class Activity {
   @ManyToMany(() => User)
   @JoinTable({ name: 'activity_participants' })
   participants: User[];
+
+  @ManyToOne('Circle', { nullable: true })
+  @JoinColumn({ name: 'circleId' })
+  circle: any;
+
+  @Column({ nullable: true })
+  circleId: string;
 }

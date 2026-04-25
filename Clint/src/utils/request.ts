@@ -124,7 +124,13 @@ function responseInterceptor(response: any): Promise<any> {
   }
 
   // 其他错误
-  const errorMessage = data?.message || '请求失败'
+  const errorMessage = Array.isArray(data?.message)
+    ? data.message
+        .filter((item: unknown): item is string => typeof item === 'string' && item.trim().length > 0)
+        .join('；') || '请求失败'
+    : typeof data?.message === 'string' && data.message.trim()
+      ? data.message
+      : '请求失败'
   uni.showToast({
     title: errorMessage,
     icon: 'none'

@@ -73,13 +73,31 @@ onShow(() => {
   updateCurrentTab()
 })
 
+// 添加切换锁，防止快速连续点击导致页面混淆
+const switching = ref(false)
+
 const switchTab = (index: number) => {
   const item = tabList.value[index]
-  if (current.value === index) return
 
+  // 如果是当前页面或正在切换中，直接返回
+  if (current.value === index || switching.value) return
+
+  switching.value = true
   current.value = index
+
   uni.switchTab({
-    url: item.pagePath
+    url: item.pagePath,
+    success: () => {
+      // 切换成功后解锁
+      setTimeout(() => {
+        switching.value = false
+      }, 300)
+    },
+    fail: () => {
+      // 切换失败也要解锁，并恢复之前的选中状态
+      switching.value = false
+      updateCurrentTab()
+    }
   })
 }
 </script>
